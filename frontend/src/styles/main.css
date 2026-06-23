@@ -1,0 +1,266 @@
+/* =========================================
+   1. CONFIGURACIÓN Y VARIABLES (TEMA PREMIUM)
+   ========================================= */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+:root {
+  /* --- PALETA DE COLORES ELEGANTE --- */
+  /* Violeta Profundo (Más sobrio y corporativo) */
+  --primary-color: #4c1d95; 
+  /* Rosado Buganvilla (Para detalles pequeños) */
+  --accent-color: #db2777;  
+  
+  /* Textos */
+  --text-dark: #1f2937; /* Casi negro, pero suave */
+  --text-muted: #6b7280; /* Gris medio */
+  
+  /* Fondos */
+  --bg-color: #f3f4f6; /* Gris muy pálido, no blanco puro para descansar la vista */
+  --white: #ffffff;
+  
+  /* --- SOMBRAS (La clave de la elegancia) --- */
+  /* Sombra sutil para tarjetas y botones blancos */
+  --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  /* Sombra flotante al pasar el mouse */
+  --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+}
+
+/* Reset y Base */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-dark);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root { min-height: 100vh; display: flex; flex-direction: column; }
+main { flex: 1; }
+
+/* =========================================
+   2. NAVBAR (Minimalista)
+   ========================================= */
+.navbar-custom {
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(0,0,0,0.05); /* Línea sutil divisora */
+  height: 80px;
+  transition: all 0.3s ease;
+}
+
+.navbar-brand-custom {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary-color) !important;
+  letter-spacing: -0.5px;
+  display: flex;
+  align-items: center;
+}
+
+/* Enlaces del menú */
+.nav-link-custom {
+  color: var(--text-dark) !important;
+  font-weight: 500;
+  font-size: 0.95rem;
+  padding: 0.5rem 1rem !important;
+  transition: color 0.2s;
+}
+
+.nav-link-custom:hover, .nav-link-custom.active {
+  color: var(--accent-color) !important;
+}
+
+/* =========================================
+   3. BOTÓN DE CUENTA (EL PROTAGONISTA)
+   ========================================= */
+
+/* El contenedor del dropdown */
+.user-dropdown {
+  position: relative;
+  display: inline-block;
+  margin-left: 15px;
+}
+
+/* ESTILO DEL BOTÓN BLANCO (Como pediste) */
+.nav-btn-primary, 
+.nav-btn-logged {
+  background-color: var(--white);
+  color: var(--text-dark);
+  border: 1px solid #e5e7eb; /* Borde gris muy suave */
+  padding: 8px 20px;
+  border-radius: 50px; /* Redondo completo */
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: var(--shadow-card); /* Sombra suave para que resalte */
+  transition: all 0.3s ease;
+}
+
+/* Efecto al pasar el mouse sobre el botón blanco */
+.nav-btn-primary:hover, 
+.nav-btn-logged:hover {
+  box-shadow: var(--shadow-hover); /* Se levanta */
+  transform: translateY(-1px);
+  border-color: var(--primary-color); /* Borde se pinta sutilmente */
+  color: var(--primary-color);
+}
+
+.arrow-down {
+  font-size: 0.7rem;
+  opacity: 0.5;
+  transition: transform 0.3s;
+}
+
+.user-dropdown:hover .arrow-down {
+  transform: rotate(180deg);
+}
+
+/* =========================================
+   4. MENÚ DESPLEGABLE (Dropdown)
+   ========================================= */
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 120%; /* Un poco separado del botón */
+  background-color: var(--white);
+  min-width: 220px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border-radius: 12px;
+  border: 1px solid #f3f4f6;
+  padding: 8px;
+  z-index: 1050;
+}
+
+.user-dropdown:hover .dropdown-menu {
+  display: block;
+  animation: fadeSlideUp 0.2s ease-out;
+}
+
+.dropdown-item {
+  border-radius: 8px;
+  padding: 10px 15px;
+  color: var(--text-dark);
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+}
+
+.dropdown-item i {
+  color: var(--text-muted); /* Iconos grises por defecto */
+  font-size: 1rem;
+}
+
+.dropdown-item:hover {
+  background-color: #f9fafb;
+  color: var(--primary-color);
+}
+
+.dropdown-item:hover i {
+  color: var(--accent-color); /* Iconos cambian de color al hover */
+}
+
+/* =========================================
+   5. FORMULARIOS (Modernos y Limpios)
+   ========================================= */
+.reservation-form {
+  background: var(--white);
+  padding: 40px;
+  border-radius: 24px; /* Bordes más curvos */
+  box-shadow: var(--shadow-card);
+  border: 1px solid #f3f4f6;
+}
+
+.form-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.form-control-custom {
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 12px 16px;
+  color: var(--text-dark);
+  transition: all 0.3s ease;
+}
+
+.form-control-custom:focus {
+  background-color: var(--white);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 4px rgba(76, 29, 149, 0.1); /* Aura violeta muy suave */
+  outline: none;
+}
+
+/* =========================================
+   6. BOTONES GENERALES (Acción)
+   ========================================= */
+.btn-primary-custom {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 12px;
+  font-weight: 600;
+  box-shadow: 0 4px 6px -1px rgba(76, 29, 149, 0.3);
+  transition: all 0.3s;
+}
+
+.btn-primary-custom:hover {
+  background-color: #3b1578; /* Un poco más oscuro */
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(76, 29, 149, 0.4);
+}
+
+/* Enlaces de texto */
+.text-primary-custom {
+  color: var(--accent-color) !important;
+  font-weight: 600;
+}
+
+/* =========================================
+   7. ANIMACIONES Y UTILIDADES
+   ========================================= */
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.loading-spinner {
+  border: 3px solid rgba(255,255,255,0.3);
+  border-radius: 50%;
+  border-top: 3px solid white;
+  width: 20px;
+  height: 20px;
+  animation: spin 1s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Ajuste responsive */
+@media (max-width: 991px) {
+  .header-container { padding: 0 20px; }
+  .navbar-custom { height: auto; padding: 15px 0; }
+  .user-dropdown { margin-left: 0; margin-top: 15px; display: block; }
+  .dropdown-menu { position: static; box-shadow: none; border: 1px solid #eee; }
+}
