@@ -3,16 +3,28 @@ package com.buganvilla.buganvillatours.whatsapp;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
 
 /**
- * WhatsApp Business Cloud API provider (Meta oficial).
- * Activar con: whatsapp.provider=meta
- * Requiere: WHATSAPP_ACCESS_TOKEN, WHATSAPP_PHONE_NUMBER_ID
+ * WhatsApp Business Cloud API (Meta oficial).
+ *
+ * Para activar:
+ *   WHATSAPP_ENABLED=true
+ *   WHATSAPP_PROVIDER=meta
+ *   WHATSAPP_PHONE_NUMBER_ID=<tu-phone-number-id>
+ *   WHATSAPP_ACCESS_TOKEN=<tu-access-token>
+ *
+ * Templates que debes crear en Meta Business Manager:
+ *   - reservation_confirmation  → parámetros: nombre, paquete, fecha, personas
+ *   - payment_confirmation      → parámetros: nombre, monto, id_reserva
+ *   - reservation_cancellation  → parámetros: nombre, paquete
  */
 @Slf4j
 @Component
@@ -42,33 +54,74 @@ public class MetaWhatsAppCloudProvider implements WhatsAppNotificationProvider {
 
     @Override
     public void sendReservationConfirmation(String phone, String name, String packageName, LocalDate date, int persons) {
-        if (!isEnabled()) { return; }
-        String cleanPhone = cleanPhone(phone);
-        log.info("Meta WhatsApp: sending reservation_confirmation to ***{}", cleanPhone.substring(Math.max(0, cleanPhone.length() - 4)));
-        // TODO: implement template message via Graph API
-        // POST /{phone-number-id}/messages with type=template, template.name=reservation_confirmation
+        if (!isEnabled()) return;
+        sendTemplateMessage(cleanPhone(phone), "reservation_confirmation", List.of(
+                textParam(name),
+                textParam(packageName),
+                textParam(date.toString()),
+                textParam(String.valueOf(persons))
+        ));
     }
 
     @Override
     public void sendPaymentConfirmation(String phone, String name, BigDecimal amount, String reservaId) {
-        if (!isEnabled()) { return; }
-        String cleanPhone = cleanPhone(phone);
-        log.info("Meta WhatsApp: sending payment_confirmation to ***{}", cleanPhone.substring(Math.max(0, cleanPhone.length() - 4)));
-        // TODO: implement template message via Graph API
+        if (!isEnabled()) return;
+        sendTemplateMessage(cleanPhone(phone), "payment_confirmation", List.of(
+                textParam(name),
+                textParam("S/ " + amount.toPlainString()),
+                textParam(reservaId)
+        ));
     }
 
     @Override
     public void sendReservationCancellation(String phone, String name, String packageName) {
-        if (!isEnabled()) { return; }
-        String cleanPhone = cleanPhone(phone);
-        log.info("Meta WhatsApp: sending reservation_cancellation to ***{}", cleanPhone.substring(Math.max(0, cleanPhone.length() - 4)));
-        // TODO: implement template message via Graph API
+        if (!isEnabled()) return;
+        sendTemplateMessage(cleanPhone(phone), "reservation_cancellation", List.of(
+                textParam(name),
+                textParam(packageName)
+        ));
     }
 
     @Override
     public boolean isEnabled() {
         return phoneNumberId != null && !phoneNumberId.isBlank()
                 && accessToken != null && !accessToken.isBlank();
+    }
+
+    private void sendTemplateMessage(String to, String templateName, List<Map<String, String>> parameters) {
+        Map<String, Object> body = Map.of(
+                "messaging_product", "whatsapp",
+                "recipient_type", "individual",
+                "to", to,
+                "type", "template",
+                "template", Map.of(
+                        "name", templateName,
+                        "language", Map.of("code", defaultLanguage),
+                        "components", List.of(
+                                Map.of("type", "body", "parameters", parameters)
+                        )
+                )
+        );
+
+        String url = apiBaseUrl + "/" + apiVersion + "/" + phoneNumberId + "/messages";
+        String suffix = to.length() >= 4 ? "***" + to.substring(to.length() - 4) : "***";
+
+        try {
+            restClient.post()
+                    .uri(url)
+                    .header("Authorization", "Bearer " + accessToken)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(body)
+                    .retrieve()
+                    .toBodilessEntity();
+            log.info("Meta WhatsApp: template '{}' enviado a {}", templateName, suffix);
+        } catch (Exception e) {
+            log.error("Meta WhatsApp: error enviando '{}' a {}: {}", templateName, suffix, e.getMessage());
+        }
+    }
+
+    private Map<String, String> textParam(String value) {
+        return Map.of("type", "text", "text", value);
     }
 
     private String cleanPhone(String phone) {

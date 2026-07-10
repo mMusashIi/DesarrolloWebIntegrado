@@ -129,7 +129,9 @@ public class InventarioPaqueteServiceImpl implements InventarioPaqueteService {
     public void reducirCupo(Long idInventario, Integer cantidad) {
         log.info("Reduciendo cupo en {} para inventario ID: {}", cantidad, idInventario);
 
-        InventarioPaquete inventario = inventarioPaqueteRepository.findById(idInventario)
+        // Bloqueo pesimista: garantiza que ninguna otra transacción concurrent
+        // pase la verificación de cupo antes de que esta transacción confirme.
+        InventarioPaquete inventario = inventarioPaqueteRepository.findByIdWithLock(idInventario)
                 .orElseThrow(() -> new RuntimeException("Inventario no encontrado con ID: " + idInventario));
 
         if (!inventario.tieneCupoDisponible(cantidad)) {

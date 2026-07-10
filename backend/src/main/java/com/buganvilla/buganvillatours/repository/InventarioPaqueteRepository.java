@@ -1,7 +1,9 @@
 package com.buganvilla.buganvillatours.repository;
 
 import com.buganvilla.buganvillatours.model.entity.InventarioPaquete;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -45,5 +47,10 @@ public interface InventarioPaqueteRepository extends JpaRepository<InventarioPaq
     // Buscar próximas salidas con cupo disponible
     @Query("SELECT ip FROM InventarioPaquete ip WHERE ip.cupoDisponible > 0 AND ip.fechaSalida >= CURRENT_DATE ORDER BY ip.fechaSalida ASC")
     List<InventarioPaquete> findProximasSalidasDisponibles();
+
+    // Bloqueo pesimista para evitar race condition al reducir cupos concurrentemente
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT ip FROM InventarioPaquete ip WHERE ip.idInventario = :id")
+    Optional<InventarioPaquete> findByIdWithLock(@Param("id") Long id);
 }
 

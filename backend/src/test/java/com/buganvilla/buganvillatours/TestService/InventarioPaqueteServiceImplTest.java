@@ -126,7 +126,7 @@ class InventarioPaqueteServiceImplTest {
 
     @Test
     void testReducirCupoOk() {
-        when(inventarioPaqueteRepository.findById(10L)).thenReturn(Optional.of(inventario));
+        when(inventarioPaqueteRepository.findByIdWithLock(10L)).thenReturn(Optional.of(inventario));
         when(inventarioPaqueteRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         inventarioService.reducirCupo(10L, 5);
@@ -138,7 +138,7 @@ class InventarioPaqueteServiceImplTest {
     @Test
     void testReducirCupoNoSuficienteDebeFallar() {
         inventario.setCupoDisponible(3);
-        when(inventarioPaqueteRepository.findById(10L)).thenReturn(Optional.of(inventario));
+        when(inventarioPaqueteRepository.findByIdWithLock(10L)).thenReturn(Optional.of(inventario));
 
         assertThrows(RuntimeException.class,
                 () -> inventarioService.reducirCupo(10L, 5));
