@@ -155,6 +155,14 @@ public class ReservaServiceImpl implements ReservaService {
 
         return reservaRepository.findById(id)
                 .map(reserva -> {
+                    if ("cancelada".equals(reserva.getEstado())) {
+                        throw new RuntimeException("La reserva ya está cancelada");
+                    }
+                    // Restaurar cupos al inventario antes de cancelar
+                    inventarioPaqueteService.aumentarCupo(
+                            reserva.getInventario().getIdInventario(),
+                            reserva.getCantidadPersonas()
+                    );
                     reserva.cancelar();
                     return reservaRepository.save(reserva);
                 })

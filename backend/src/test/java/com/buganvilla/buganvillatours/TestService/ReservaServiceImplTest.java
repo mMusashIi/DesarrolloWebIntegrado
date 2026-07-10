@@ -182,6 +182,17 @@ class ReservaServiceImplTest {
         Reserva result = reservaService.cancelarReserva(1L);
 
         assertEquals("cancelada", result.getEstado());
+        // Verifica que se restauran los cupos al cancelar (bug fix)
+        verify(inventarioPaqueteService).aumentarCupo(100L, 2);
+    }
+
+    @Test
+    void testCancelarReservaYaCancelada() {
+        reserva.setEstado("cancelada");
+        when(reservaRepository.findById(1L)).thenReturn(Optional.of(reserva));
+
+        assertThrows(RuntimeException.class, () -> reservaService.cancelarReserva(1L));
+        verify(inventarioPaqueteService, never()).aumentarCupo(anyLong(), anyInt());
     }
 
     @Test
