@@ -1,9 +1,11 @@
 services:
 
   sqlserver:
-    image: mcr.microsoft.com/mssql/server:2022-latest
+    build:
+      context: ./docker
+      dockerfile: sqlserver.Dockerfile
     environment:
-      SA_PASSWORD: "${DB_PASSWORD}"
+      SA_PASSWORD: "${DB_PASSWORD:-BuganvillaT0urs!Dev}"
       ACCEPT_EULA: "Y"
       MSSQL_PID: "Express"
     ports:
@@ -13,21 +15,38 @@ services:
     networks:
       - buganvilla-net
     healthcheck:
-      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P \"$$SA_PASSWORD\" -Q \"SELECT 1\" || exit 1"]
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"${DB_PASSWORD:-BuganvillaT0urs!Dev}\" -No -Q \"SELECT name FROM sys.databases WHERE name='BuganvillaTours1'\" | grep -q BuganvillaTours1 || exit 1"]
       interval: 15s
       timeout: 10s
-      retries: 10
-      start_period: 30s
+      retries: 15
+      start_period: 60s
 
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
     env_file:
-      - .env
+      - path: .env
+        required: false
     environment:
       DB_URL: "jdbc:sqlserver://sqlserver:1433;databaseName=BuganvillaTours1;encrypt=true;trustServerCertificate=true;"
-      CORS_ALLOWED_ORIGINS: "http://localhost,http://frontend"
+      DB_USERNAME: "sa"
+      DB_PASSWORD: "${DB_PASSWORD:-BuganvillaT0urs!Dev}"
+      JWT_SECRET: "${JWT_SECRET:-mySuperSecretKeyForBuganvillaToursApplication2024SecurityWithSpringBoot3}"
+      JWT_EXPIRATION: "86400000"
+      CORS_ALLOWED_ORIGINS: "http://localhost,http://localhost:80"
+      SHOW_SQL: "false"
+      LOG_LEVEL: "INFO"
+      WHATSAPP_ENABLED: "false"
+      WHATSAPP_PROVIDER: "mock"
+      # Tokens externos: se leen de .env si existe, vacío si no (app arranca igual, sin esa funcionalidad)
+      APIS_NET_TOKEN: "${APIS_NET_TOKEN:-}"
+      MP_ACCESS_TOKEN: "${MP_ACCESS_TOKEN:-}"
+      MP_PUBLIC_KEY: "${MP_PUBLIC_KEY:-}"
+      MP_BACK_URL_SUCCESS: "${MP_BACK_URL_SUCCESS:-http://localhost:8080/api/mercadopago/pago-exitoso}"
+      MP_BACK_URL_FAILURE: "${MP_BACK_URL_FAILURE:-http://localhost:8080/api/mercadopago/pago-fallido}"
+      MP_BACK_URL_PENDING: "${MP_BACK_URL_PENDING:-http://localhost:8080/api/mercadopago/pago-fallido}"
+      MP_NOTIFICATION_URL: "${MP_NOTIFICATION_URL:-}"
     ports:
       - "8080:8080"
     depends_on:
@@ -40,7 +59,7 @@ services:
       interval: 20s
       timeout: 10s
       retries: 5
-      start_period: 60s
+      start_period: 90s
 
   frontend:
     build:
