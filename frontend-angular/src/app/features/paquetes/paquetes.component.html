@@ -1,0 +1,174 @@
+<!-- Page Header -->
+<section class="py-4 text-white" style="background: linear-gradient(135deg, #4c1d95, #6d28d9);">
+  <div class="container">
+    <h1 class="fw-bold mb-1">🏔️ Nuestros Paquetes Turísticos</h1>
+    <p class="opacity-75 mb-0">Explora los destinos más increíbles del Perú</p>
+  </div>
+</section>
+
+<!-- Filters -->
+<section class="py-3 bg-white shadow-sm sticky-top">
+  <div class="container">
+    <div class="row g-3 align-items-center">
+      <div class="col-md-6">
+        <input type="text" class="form-control" placeholder="Buscar por nombre, ciudad o descripción..."
+          [ngModel]="searchText()" (ngModelChange)="searchText.set($event)">
+      </div>
+      <div class="col-md-3">
+        <select class="form-select" [ngModel]="filtroEstado()" (ngModelChange)="filtroEstado.set($event)">
+          <option value="activo">Solo activos</option>
+          <option value="">Todos los estados</option>
+        </select>
+      </div>
+      <div class="col-md-3 text-muted small">
+        {{ filteredPaquetes().length }} paquete(s) encontrado(s)
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Package Grid -->
+<section class="py-5" style="background-color: #f3f4f6;">
+  <div class="container">
+    @if (loading()) {
+      <app-loading-spinner></app-loading-spinner>
+    } @else if (filteredPaquetes().length === 0) {
+      <div class="text-center py-5">
+        <div class="display-1">🔍</div>
+        <h4 class="text-muted">No se encontraron paquetes</h4>
+        <p class="text-muted">Intenta con otros términos de búsqueda</p>
+        <button class="btn btn-outline-secondary" (click)="searchText.set(''); filtroEstado.set('activo')">
+          Limpiar filtros
+        </button>
+      </div>
+    } @else {
+      <div class="row g-4">
+        @for (paquete of filteredPaquetes(); track paquete.idPaquete) {
+          <div class="col-md-4 col-lg-4">
+            <div class="card card-custom h-100">
+              <div class="position-relative">
+                <img [src]="getImageUrl(paquete)" [alt]="paquete.nombrePaquete"
+                  class="card-img-top" style="height: 220px; object-fit: cover;">
+                <span class="badge position-absolute top-0 end-0 m-2"
+                  [style.background]="paquete.estado === 'activo' ? '#059669' : '#dc2626'">
+                  {{ paquete.estado }}
+                </span>
+              </div>
+              <div class="card-body d-flex flex-column">
+                <div class="d-flex gap-2 mb-2">
+                  <span class="badge" style="background: #ede9fe; color: #4c1d95;">
+                    📍 {{ paquete.lugar?.ciudad || 'Cusco' }}
+                  </span>
+                  <span class="badge" style="background: #fce7f3; color: #db2777;">
+                    🕐 {{ paquete.duracionDias }} día(s)
+                  </span>
+                </div>
+                <h5 class="card-title fw-bold">{{ paquete.nombrePaquete }}</h5>
+                <p class="card-text text-muted flex-grow-1" style="font-size: 0.9rem;">
+                  {{ paquete.descripcion | slice:0:120 }}{{ (paquete.descripcion?.length ?? 0) > 120 ? '...' : '' }}
+                </p>
+                <div class="d-flex justify-content-between align-items-center mt-3 mb-2">
+                  <span class="fs-5 fw-bold" style="color: #4c1d95;">
+                    S/ {{ paquete.precioBase | number:'1.2-2' }}
+                  </span>
+                  <span class="text-muted small">
+                    @if (getCuposTotal(paquete.idPaquete) > 0) {
+                      ✅ {{ getCuposTotal(paquete.idPaquete) }} cupos
+                    } @else {
+                      <span class="text-danger">Sin cupos</span>
+                    }
+                  </span>
+                </div>
+                <button class="btn btn-primary-custom text-white mt-2" (click)="openModal(paquete)">
+                  Ver detalles
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</section>
+
+<!-- Package Detail Modal -->
+@if (selectedPaquete()) {
+  <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header" style="background: linear-gradient(135deg, #4c1d95, #6d28d9); color: white;">
+          <h5 class="modal-title fw-bold">{{ selectedPaquete()!.nombrePaquete }}</h5>
+          <button type="button" class="btn-close btn-close-white" (click)="closeModal()"></button>
+        </div>
+        <div class="modal-body p-0">
+          <img [src]="getImageUrl(selectedPaquete()!)" [alt]="selectedPaquete()!.nombrePaquete"
+            class="img-fluid w-100" style="max-height: 300px; object-fit: cover;">
+          <div class="p-4">
+            <div class="d-flex gap-2 mb-3">
+              <span class="badge fs-6" style="background: #ede9fe; color: #4c1d95;">
+                📍 {{ selectedPaquete()!.lugar?.ciudad || 'Cusco' }}
+              </span>
+              <span class="badge fs-6" style="background: #fce7f3; color: #db2777;">
+                🕐 {{ selectedPaquete()!.duracionDias }} día(s)
+              </span>
+            </div>
+            <p class="text-muted">{{ selectedPaquete()!.descripcion }}</p>
+
+            <div class="border-top pt-3 mt-3">
+              <h6 class="fw-bold">Fechas Disponibles</h6>
+              @if (getInventarioByPaquete(selectedPaquete()!.idPaquete).length === 0) {
+                <p class="text-muted">No hay fechas disponibles actualmente.</p>
+              } @else {
+                <div class="row g-2">
+                  @for (inv of getInventarioByPaquete(selectedPaquete()!.idPaquete); track inv.idInventario) {
+                    <div class="col-auto">
+                      <button class="btn btn-sm"
+                        [class.btn-outline-secondary]="selectedInventario()?.idInventario !== inv.idInventario"
+                        [class.btn-primary]="selectedInventario()?.idInventario === inv.idInventario"
+                        (click)="selectedInventario.set(inv)">
+                        {{ inv.fechaSalida }} — {{ inv.cupoDisponible }} cupos
+                      </button>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-4">
+              <div>
+                <span class="text-muted small">Precio por persona</span>
+                <div class="fs-3 fw-bold" style="color: #4c1d95;">
+                  S/ {{ selectedPaquete()!.precioBase | number:'1.2-2' }}
+                </div>
+              </div>
+              @if (getInventarioByPaquete(selectedPaquete()!.idPaquete).length > 0) {
+                <a routerLink="/reservas" class="btn btn-lg btn-primary-custom text-white"
+                  (click)="closeModal()">
+                  Reservar Ahora
+                </a>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Auth Required Modal -->
+@if (showAuthModal()) {
+  <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content text-center p-4">
+        <div class="display-3 mb-3">🔒</div>
+        <h5 class="fw-bold">Autenticación Requerida</h5>
+        <p class="text-muted">Necesitas iniciar sesión para realizar una reserva.</p>
+        <div class="d-flex gap-2 justify-content-center mt-3">
+          <button class="btn btn-outline-secondary" (click)="showAuthModal.set(false)">Cancelar</button>
+          <a routerLink="/register" class="btn text-white" style="background: #4c1d95;"
+            (click)="showAuthModal.set(false)">Registrarse</a>
+        </div>
+      </div>
+    </div>
+  </div>
+}

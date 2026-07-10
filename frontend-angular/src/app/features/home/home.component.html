@@ -1,0 +1,149 @@
+<!-- HERO SECTION -->
+<section class="hero-gradient text-white py-5" style="min-height: 85vh; display: flex; align-items: center;">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-6">
+        <span class="badge mb-3 px-3 py-2 fw-semibold" style="background: rgba(219,39,119,0.2); color: #db2777; font-size: 0.9rem;">
+          🌸 Explorando el Perú
+        </span>
+        <h1 class="display-4 fw-bold mb-4">
+          Descubre la Magia del <span style="color: #f9a8d4;">Cusco</span>
+        </h1>
+        <p class="lead mb-4 opacity-75">
+          Vive experiencias únicas en los destinos más increíbles del Perú. Tours guiados, precios accesibles y recuerdos para siempre.
+        </p>
+        <div class="d-flex gap-3 flex-wrap">
+          <a routerLink="/paquetes" class="btn btn-lg fw-bold" style="background: #db2777; color: white; border-radius: 30px; padding: 0.75rem 2rem;">
+            Ver Paquetes
+          </a>
+          <a routerLink="/nosotros" class="btn btn-lg btn-outline-light fw-bold" style="border-radius: 30px; padding: 0.75rem 2rem;">
+            Conócenos
+          </a>
+        </div>
+      </div>
+      <div class="col-lg-6 d-none d-lg-block text-center">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Machu_Picchu%2C_Peru.jpg/800px-Machu_Picchu%2C_Peru.jpg"
+          alt="Machu Picchu" class="img-fluid rounded-4 shadow-lg" style="max-height: 500px; object-fit: cover;">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS SECTION -->
+<section class="py-5 bg-white">
+  <div class="container">
+    <div class="row g-4 text-center">
+      @for (stat of stats; track stat.label) {
+        <div class="col-6 col-md-3">
+          <div class="p-3">
+            <div class="display-5 mb-1">{{ stat.icon }}</div>
+            <div class="display-6 fw-bold" style="color: #4c1d95;">{{ stat.value }}</div>
+            <div class="text-muted">{{ stat.label }}</div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- FEATURED PACKAGES -->
+<section class="py-5" style="background-color: #f3f4f6;">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="section-title">Nuestros Paquetes Destacados</h2>
+      <p class="section-subtitle">Experiencias diseñadas para que nunca olvides tu visita al Perú</p>
+    </div>
+
+    @if (loading()) {
+      <app-loading-spinner></app-loading-spinner>
+    } @else if (paquetes().length === 0) {
+      <div class="text-center py-5 text-muted">
+        <p class="fs-5">No hay paquetes disponibles en este momento.</p>
+      </div>
+    } @else {
+      <div class="row g-4">
+        @for (paquete of paquetes().slice(0, 3); track paquete.idPaquete) {
+          <div class="col-md-4">
+            <div class="card card-custom h-100">
+              <img [src]="getImageUrl(paquete)" [alt]="paquete.nombrePaquete"
+                class="card-img-top" style="height: 220px; object-fit: cover;">
+              <div class="card-body d-flex flex-column">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <span class="badge" style="background: #ede9fe; color: #4c1d95;">
+                    {{ paquete.lugar?.ciudad || 'Cusco' }}
+                  </span>
+                  <span class="badge" style="background: #fce7f3; color: #db2777;">
+                    {{ paquete.duracionDias }} día(s)
+                  </span>
+                </div>
+                <h5 class="card-title fw-bold mt-2">{{ paquete.nombrePaquete }}</h5>
+                <p class="card-text text-muted flex-grow-1" style="font-size: 0.9rem;">
+                  {{ paquete.descripcion | slice:0:100 }}{{ (paquete.descripcion?.length ?? 0) > 100 ? '...' : '' }}
+                </p>
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                  <span class="fs-5 fw-bold" style="color: #4c1d95;">
+                    S/ {{ paquete.precioBase | number:'1.2-2' }}
+                  </span>
+                  <span class="text-muted small">
+                    {{ getCuposPaquete(paquete.idPaquete) }} cupos
+                  </span>
+                </div>
+                <a routerLink="/paquetes" class="btn btn-primary-custom mt-3 text-white">
+                  Ver detalles
+                </a>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+      <div class="text-center mt-4">
+        <a routerLink="/paquetes" class="btn btn-lg btn-outline-secondary">
+          Ver todos los paquetes →
+        </a>
+      </div>
+    }
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="py-5 bg-white">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="section-title">Lo que dicen nuestros viajeros</h2>
+      <p class="section-subtitle">Más de 2,000 viajeros satisfechos avalan nuestra calidad</p>
+    </div>
+    <div class="row g-4">
+      @for (t of testimonios; track t.nombre) {
+        <div class="col-md-4">
+          <div class="card card-custom h-100 p-4">
+            <div class="text-warning mb-2">
+              @for (s of [1,2,3,4,5]; track s) { <span>⭐</span> }
+            </div>
+            <p class="text-muted fst-italic mb-3">"{{ t.texto }}"</p>
+            <div class="d-flex align-items-center">
+              <div class="rounded-circle text-white fw-bold d-flex align-items-center justify-content-center me-3"
+                style="width:40px; height:40px; background: #4c1d95; min-width:40px;">
+                {{ t.nombre[0] }}
+              </div>
+              <div>
+                <div class="fw-semibold">{{ t.nombre }}</div>
+                <div class="text-muted small">{{ t.origen }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- CTA SECTION -->
+<section class="py-5 text-white" style="background: linear-gradient(135deg, #4c1d95, #db2777);">
+  <div class="container text-center">
+    <h2 class="display-6 fw-bold mb-3">¿Listo para tu próxima aventura?</h2>
+    <p class="lead mb-4 opacity-75">Únete a miles de viajeros que ya descubrieron el Perú con nosotros</p>
+    <a routerLink="/paquetes" class="btn btn-lg btn-light fw-bold" style="border-radius: 30px; padding: 0.75rem 2.5rem;">
+      Explorar Paquetes
+    </a>
+  </div>
+</section>

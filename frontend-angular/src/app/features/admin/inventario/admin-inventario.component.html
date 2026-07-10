@@ -1,0 +1,117 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4 class="fw-bold mb-0">📅 Gestión de Inventario</h4>
+  <button class="btn fw-bold text-white" style="background: #4c1d95;" (click)="openCreate()">
+    + Nueva Fecha
+  </button>
+</div>
+
+@if (loading()) {
+  <app-loading-spinner></app-loading-spinner>
+} @else {
+  <div class="card">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>#</th>
+            <th>Paquete</th>
+            <th>Fecha Salida</th>
+            <th>Cupo Total</th>
+            <th>Disponible</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (inv of inventarios(); track inv.idInventario) {
+            <tr>
+              <td>{{ inv.idInventario }}</td>
+              <td class="fw-semibold">{{ inv.nombrePaquete || getPaqueteName(inv.idPaquete) }}</td>
+              <td>{{ inv.fechaSalida }}</td>
+              <td>{{ inv.cupoTotal }}</td>
+              <td>
+                <span class="badge" [style.background]="inv.cupoDisponible > 0 ? '#d1fae5' : '#fee2e2'"
+                  [style.color]="inv.cupoDisponible > 0 ? '#065f46' : '#991b1b'">
+                  {{ inv.cupoDisponible }}
+                </span>
+              </td>
+              <td>
+                <button class="btn btn-sm btn-outline-primary me-1" (click)="openEdit(inv)">✏️</button>
+                <button class="btn btn-sm btn-outline-danger" (click)="delete(inv.idInventario)">🗑️</button>
+              </td>
+            </tr>
+          } @empty {
+            <tr><td colspan="6" class="text-center text-muted py-4">No hay fechas de salida registradas.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+}
+
+<!-- Form Modal -->
+@if (showForm()) {
+  <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header" style="background: linear-gradient(135deg, #4c1d95, #6d28d9); color: white;">
+          <h5 class="modal-title fw-bold">{{ editingId() ? 'Editar Fecha' : 'Nueva Fecha de Salida' }}</h5>
+          <button type="button" class="btn-close btn-close-white" (click)="closeForm()"></button>
+        </div>
+        <div class="modal-body p-4">
+          @if (error()) {
+            <div class="alert alert-danger">{{ error() }}</div>
+          }
+          <form [formGroup]="form" (ngSubmit)="submit()">
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Paquete *</label>
+              <select formControlName="idPaquete" class="form-select"
+                [class.is-invalid]="field('idPaquete').invalid && field('idPaquete').touched">
+                <option value="">Selecciona un paquete</option>
+                @for (p of paquetes(); track p.idPaquete) {
+                  <option [value]="p.idPaquete">{{ p.nombrePaquete }}</option>
+                }
+              </select>
+              @if (field('idPaquete').invalid && field('idPaquete').touched) {
+                <div class="invalid-feedback">Paquete requerido.</div>
+              }
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Fecha de Salida *</label>
+              <input type="date" formControlName="fechaSalida" class="form-control"
+                [class.is-invalid]="field('fechaSalida').invalid && field('fechaSalida').touched">
+              @if (field('fechaSalida').invalid && field('fechaSalida').touched) {
+                <div class="invalid-feedback">Fecha requerida.</div>
+              }
+            </div>
+            <div class="row g-3 mb-3">
+              <div class="col-6">
+                <label class="form-label fw-semibold">Cupo Total *</label>
+                <input type="number" formControlName="cupoTotal" class="form-control" min="1"
+                  [class.is-invalid]="field('cupoTotal').invalid && field('cupoTotal').touched">
+                @if (field('cupoTotal').invalid && field('cupoTotal').touched) {
+                  <div class="invalid-feedback">Mínimo 1.</div>
+                }
+              </div>
+              <div class="col-6">
+                <label class="form-label fw-semibold">Cupo Disponible *</label>
+                <input type="number" formControlName="cupoDisponible" class="form-control" min="0"
+                  [class.is-invalid]="field('cupoDisponible').invalid && field('cupoDisponible').touched">
+                @if (field('cupoDisponible').invalid && field('cupoDisponible').touched) {
+                  <div class="invalid-feedback">No puede ser negativo.</div>
+                }
+              </div>
+            </div>
+            <div class="d-flex gap-2 justify-content-end">
+              <button type="button" class="btn btn-outline-secondary" (click)="closeForm()">Cancelar</button>
+              <button type="submit" class="btn text-white fw-bold" [disabled]="saving()"
+                style="background: #4c1d95;">
+                @if (saving()) { <span class="spinner-border spinner-border-sm me-1"></span> }
+                {{ editingId() ? 'Actualizar' : 'Crear' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+}

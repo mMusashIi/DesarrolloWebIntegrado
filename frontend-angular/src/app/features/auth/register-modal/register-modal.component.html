@@ -1,0 +1,72 @@
+<div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header" style="background: linear-gradient(135deg, #db2777, #be185d); color: white;">
+        <h5 class="modal-title fw-bold">🌸 Crear Cuenta</h5>
+        <button type="button" class="btn-close btn-close-white" (click)="close.emit()"></button>
+      </div>
+      <div class="modal-body p-4">
+        @if (error()) {
+          <div class="alert alert-danger">{{ error() }}</div>
+        }
+        <form [formGroup]="form" (ngSubmit)="submit()">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Nombre</label>
+              <input type="text" formControlName="nombre" class="form-control"
+                [class.is-invalid]="field('nombre').invalid && field('nombre').touched">
+              @if (field('nombre').invalid && field('nombre').touched) {
+                <div class="invalid-feedback">Nombre requerido (mín. 2 caracteres).</div>
+              }
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Apellido</label>
+              <input type="text" formControlName="apellido" class="form-control"
+                [class.is-invalid]="field('apellido').invalid && field('apellido').touched">
+              @if (field('apellido').invalid && field('apellido').touched) {
+                <div class="invalid-feedback">Apellido requerido (mín. 2 caracteres).</div>
+              }
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Email</label>
+              <input type="email" formControlName="email" class="form-control"
+                [class.is-invalid]="field('email').invalid && field('email').touched">
+              @if (field('email').invalid && field('email').touched) {
+                <div class="invalid-feedback">Email inválido.</div>
+              }
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Contraseña</label>
+              <input type="password" formControlName="password" class="form-control"
+                [class.is-invalid]="field('password').invalid && field('password').touched">
+              @if (field('password').invalid && field('password').touched) {
+                <div class="invalid-feedback">Mínimo 6 caracteres.</div>
+              }
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Teléfono</label>
+              <input type="tel" formControlName="telefono" class="form-control"
+                [class.is-invalid]="field('telefono').invalid && field('telefono').touched">
+              @if (field('telefono').invalid && field('telefono').touched) {
+                <div class="invalid-feedback">Teléfono requerido.</div>
+              }
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Nacionalidad</label>
+              <input type="text" formControlName="nacionalidad" class="form-control"
+                [class.is-invalid]="field('nacionalidad').invalid && field('nacionalidad').touched">
+              @if (field('nacionalidad').invalid && field('nacionalidad').touched) {
+                <div class="invalid-feedback">Nacionalidad requerida.</div>
+              }
+            </div>
+          </div>
+          <button type="submit" class="btn w-100 fw-bold text-white mt-4" [disabled]="loading()"
+            style="background: linear-gradient(135deg, #db2777, #be185d);">
+            @if (loading()) { <span class="spinner-border spinner-border-sm me-2"></span> }
+            Crear Cuenta
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

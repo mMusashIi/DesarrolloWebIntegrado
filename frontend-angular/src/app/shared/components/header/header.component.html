@@ -1,0 +1,72 @@
+<nav class="navbar navbar-expand-lg navbar-dark" style="background: linear-gradient(135deg, #4c1d95, #6d28d9);">
+  <div class="container">
+    <a class="navbar-brand fw-bold" routerLink="/">
+      <span style="color: #db2777;">🌸</span> Buganvilla Tours
+    </a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Inicio</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/paquetes" routerLinkActive="active">Paquetes</a>
+        </li>
+        @if (auth.isAuthenticated()) {
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/reservas" routerLinkActive="active">Reservar</a>
+          </li>
+        }
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/nosotros" routerLinkActive="active">Nosotros</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/contacto" routerLinkActive="active">Contacto</a>
+        </li>
+      </ul>
+
+      <div class="d-flex align-items-center gap-2">
+        @if (auth.isAuthenticated()) {
+          @if (auth.isAdmin()) {
+            <a routerLink="/admin" class="btn btn-sm btn-warning fw-bold">
+              Panel Admin
+            </a>
+          }
+          <div class="dropdown">
+            <button class="btn btn-sm btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
+              {{ auth.currentUser()?.nombre }} {{ auth.currentUser()?.apellido }}
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><span class="dropdown-item-text text-muted small">{{ auth.currentUser()?.email }}</span></li>
+              <li><hr class="dropdown-divider"></li>
+              <li>
+                <button class="dropdown-item text-danger" (click)="auth.logout()">
+                  Cerrar sesión
+                </button>
+              </li>
+            </ul>
+          </div>
+        } @else {
+          <button class="btn btn-sm btn-outline-light" (click)="openLogin()">
+            Iniciar sesión
+          </button>
+          <a routerLink="/register" class="btn btn-sm" style="background-color: #db2777; color: white;">
+            Registrarse
+          </a>
+        }
+      </div>
+    </div>
+  </div>
+</nav>
+
+@if (showLoginModal()) {
+  <app-login-modal (close)="closeLogin()" (success)="onLoginSuccess()"></app-login-modal>
+}
+
+@if (showRegisterModal()) {
+  <app-register-modal (close)="closeRegister()" (success)="onRegisterSuccess()"></app-register-modal>
+}

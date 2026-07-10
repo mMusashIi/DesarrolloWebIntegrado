@@ -1,0 +1,151 @@
+@import 'bootstrap/dist/css/bootstrap.min.css';
+
+:root {
+  --primary-color: #4c1d95;
+  --primary-dark: #3b1570;
+  --primary-light: #6d28d9;
+  --accent-color: #db2777;
+  --accent-dark: #be185d;
+  --text-dark: #1f2937;
+  --text-muted: #6b7280;
+  --bg-color: #f3f4f6;
+  --white: #ffffff;
+  --success: #059669;
+  --danger: #dc2626;
+  --warning: #d97706;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-dark);
+}
+
+/* Buttons */
+.btn-primary-custom {
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+  border: none;
+  color: white;
+  padding: 0.6rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-primary-custom:hover {
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(76, 29, 149, 0.3);
+  color: white;
+}
+
+.btn-accent-custom {
+  background: linear-gradient(135deg, var(--accent-color), var(--accent-dark));
+  border: none;
+  color: white;
+  padding: 0.6rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-accent-custom:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+  color: white;
+}
+
+/* Cards */
+.card-custom {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-custom:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+/* Forms */
+.form-control-custom {
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.form-control-custom:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(76, 29, 149, 0.1);
+  outline: none;
+}
+
+/* Badges */
+.badge-primary {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+}
+
+.badge-accent {
+  background-color: var(--accent-color);
+  color: white;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+}
+
+/* Section titles */
+.section-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-bottom: 0.5rem;
+}
+
+.section-subtitle {
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+}
+
+/* Hero gradient */
+.hero-gradient {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 50%, var(--accent-color) 100%);
+}
+
+/* Loading overlay */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+/* Admin sidebar */
+.admin-sidebar {
+  background: linear-gradient(180deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+  min-height: 100vh;
+  width: 250px;
+}
+
+/* Utility */
+.text-primary-custom { color: var(--primary-color) !important; }
+.text-accent-custom { color: var(--accent-color) !important; }
+.bg-primary-custom { background-color: var(--primary-color) !important; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .section-title { font-size: 1.5rem; }
+  .admin-sidebar { width: 100%; min-height: auto; }
+}

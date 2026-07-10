@@ -1,0 +1,59 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4 class="fw-bold mb-0">👥 Gestión de Usuarios</h4>
+  <span class="badge fs-6" style="background: #ede9fe; color: #4c1d95;">{{ usuarios().length }} usuarios</span>
+</div>
+
+@if (loading()) {
+  <app-loading-spinner></app-loading-spinner>
+} @else {
+  <div class="card">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>#</th>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>DNI</th>
+            <th>Teléfono</th>
+            <th>Rol</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (u of usuarios(); track u.idUsuario) {
+            <tr>
+              <td>{{ u.idUsuario }}</td>
+              <td class="fw-semibold">{{ u.nombre }} {{ u.apellido }}</td>
+              <td>{{ u.email }}</td>
+              <td>{{ u.dni || '—' }}</td>
+              <td>{{ u.telefono || '—' }}</td>
+              <td>
+                <span class="badge"
+                  [style.background]="u.rol?.toLowerCase() === 'admin' ? '#fef3c7' : '#ede9fe'"
+                  [style.color]="u.rol?.toLowerCase() === 'admin' ? '#92400e' : '#4c1d95'">
+                  {{ u.rol }}
+                </span>
+              </td>
+              <td>
+                @if (u.rol?.toLowerCase() !== 'admin') {
+                  <button class="btn btn-sm btn-outline-danger"
+                    [disabled]="deleting() === u.idUsuario"
+                    (click)="delete(u.idUsuario)">
+                    @if (deleting() === u.idUsuario) {
+                      <span class="spinner-border spinner-border-sm"></span>
+                    } @else {
+                      🗑️
+                    }
+                  </button>
+                }
+              </td>
+            </tr>
+          } @empty {
+            <tr><td colspan="7" class="text-center text-muted py-4">No hay usuarios registrados.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+}

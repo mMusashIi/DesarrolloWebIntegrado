@@ -1,0 +1,169 @@
+<!-- Header -->
+<section class="py-4 text-white" style="background: linear-gradient(135deg, #4c1d95, #6d28d9);">
+  <div class="container">
+    <h1 class="fw-bold mb-1">📋 Realizar Reserva</h1>
+    <p class="opacity-75 mb-0">Completa los datos para asegurar tu lugar en el tour</p>
+  </div>
+</section>
+
+<section class="py-5" style="background-color: #f3f4f6;">
+  <div class="container">
+    @if (reservaCreada()) {
+      <!-- SUCCESS STATE -->
+      <div class="row justify-content-center">
+        <div class="col-md-8">
+          <div class="card text-center p-5">
+            <div class="display-1 mb-3">✅</div>
+            <h3 class="fw-bold text-success">¡Reserva creada exitosamente!</h3>
+            <p class="text-muted">Reserva #{{ reservaCreada()!.idReserva }} — Estado: {{ reservaCreada()!.estado }}</p>
+            @if (initPoint()) {
+              <div class="mt-4">
+                <p class="fw-semibold">Completa tu pago con MercadoPago:</p>
+                <a [href]="initPoint()" target="_blank"
+                  class="btn btn-lg fw-bold text-white"
+                  style="background: linear-gradient(135deg, #009ee3, #00b1ea);">
+                  💳 Pagar con MercadoPago
+                </a>
+              </div>
+            } @else {
+              <p class="text-muted mt-3">{{ successMsg() }}</p>
+            }
+          </div>
+        </div>
+      </div>
+    } @else {
+      <!-- RESERVATION FORM -->
+      <div class="row g-4">
+        <div class="col-lg-8">
+          <div class="card p-4">
+            <h5 class="fw-bold mb-4">Datos del viajero</h5>
+            @if (error()) {
+              <div class="alert alert-danger">{{ error() }}</div>
+            }
+            <form [formGroup]="form" (ngSubmit)="submit()">
+              <!-- DNI Row -->
+              <div class="row g-3 mb-3">
+                <div class="col-md-5">
+                  <label class="form-label fw-semibold">DNI *</label>
+                  <div class="input-group">
+                    <input type="text" formControlName="dni" class="form-control"
+                      [class.is-invalid]="field('dni').invalid && field('dni').touched"
+                      placeholder="12345678" maxlength="8">
+                    <button type="button" class="btn btn-outline-secondary" (click)="buscarDni()"
+                      [disabled]="buscandoDni() || field('dni').value?.length !== 8">
+                      @if (buscandoDni()) { <span class="spinner-border spinner-border-sm"></span> }
+                      @else { 🔍 }
+                    </button>
+                  </div>
+                  @if (field('dni').invalid && field('dni').touched) {
+                    <div class="text-danger small mt-1">DNI de 8 dígitos requerido.</div>
+                  }
+                </div>
+                <div class="col-md-7">
+                  <label class="form-label fw-semibold">Nombre completo *</label>
+                  <input type="text" formControlName="nombreCompleto" class="form-control"
+                    [class.is-invalid]="field('nombreCompleto').invalid && field('nombreCompleto').touched">
+                  @if (field('nombreCompleto').invalid && field('nombreCompleto').touched) {
+                    <div class="invalid-feedback">Nombre requerido.</div>
+                  }
+                </div>
+              </div>
+
+              <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold">Email *</label>
+                  <input type="email" formControlName="email" class="form-control"
+                    [class.is-invalid]="field('email').invalid && field('email').touched">
+                  @if (field('email').invalid && field('email').touched) {
+                    <div class="invalid-feedback">Email inválido.</div>
+                  }
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold">Teléfono *</label>
+                  <input type="tel" formControlName="telefono" class="form-control"
+                    [class.is-invalid]="field('telefono').invalid && field('telefono').touched">
+                  @if (field('telefono').invalid && field('telefono').touched) {
+                    <div class="invalid-feedback">Teléfono requerido.</div>
+                  }
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Fecha de salida / Tour *</label>
+                <select formControlName="idInventario" class="form-select"
+                  [class.is-invalid]="field('idInventario').invalid && field('idInventario').touched">
+                  <option value="">Selecciona una fecha disponible</option>
+                  @for (inv of inventarios(); track inv.idInventario) {
+                    <option [value]="inv.idInventario">
+                      {{ inv.nombrePaquete || 'Tour' }} — {{ inv.fechaSalida }} ({{ inv.cupoDisponible }} cupos)
+                    </option>
+                  }
+                </select>
+                @if (field('idInventario').invalid && field('idInventario').touched) {
+                  <div class="invalid-feedback">Selecciona una fecha.</div>
+                }
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label fw-semibold">
+                  Cantidad de personas *
+                  @if (field('idInventario').value) {
+                    <span class="text-muted small ms-2">(máx: {{ getCuposDisponibles() }})</span>
+                  }
+                </label>
+                <input type="number" formControlName="cantidadPersonas" class="form-control"
+                  [class.is-invalid]="field('cantidadPersonas').invalid && field('cantidadPersonas').touched"
+                  min="1" [max]="getCuposDisponibles()">
+                @if (field('cantidadPersonas').invalid && field('cantidadPersonas').touched) {
+                  <div class="invalid-feedback">Mínimo 1 persona.</div>
+                }
+              </div>
+
+              <div class="form-check mb-4">
+                <input type="checkbox" class="form-check-input" formControlName="terminos" id="terminos"
+                  [class.is-invalid]="field('terminos').invalid && field('terminos').touched">
+                <label class="form-check-label" for="terminos">
+                  Acepto los términos y condiciones de reserva
+                </label>
+                @if (field('terminos').invalid && field('terminos').touched) {
+                  <div class="invalid-feedback d-block">Debes aceptar los términos.</div>
+                }
+              </div>
+
+              <button type="submit" class="btn btn-lg w-100 fw-bold text-white" [disabled]="submitting()"
+                style="background: linear-gradient(135deg, #4c1d95, #6d28d9);">
+                @if (submitting()) { <span class="spinner-border spinner-border-sm me-2"></span> }
+                Confirmar Reserva
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Summary -->
+        <div class="col-lg-4">
+          <div class="card p-4 sticky-top" style="top: 80px;">
+            <h5 class="fw-bold mb-3">📋 Resumen</h5>
+            @if (field('idInventario').value) {
+              <div class="border rounded p-3 mb-3" style="background: #f9fafb;">
+                <div class="fw-semibold">{{ getInventarioById(+field('idInventario').value)?.nombrePaquete || 'Tour seleccionado' }}</div>
+                <div class="text-muted small">Salida: {{ getInventarioById(+field('idInventario').value)?.fechaSalida }}</div>
+                <div class="text-muted small">Cupos disponibles: {{ getInventarioById(+field('idInventario').value)?.cupoDisponible }}</div>
+              </div>
+            }
+            <div class="d-flex justify-content-between py-2 border-bottom">
+              <span class="text-muted">Personas:</span>
+              <span class="fw-semibold">{{ field('cantidadPersonas').value }}</span>
+            </div>
+            <div class="d-flex justify-content-between py-2">
+              <span class="text-muted">Estado:</span>
+              <span class="badge" style="background: #fef3c7; color: #92400e;">pendiente</span>
+            </div>
+            <div class="alert alert-info mt-3 small">
+              💳 Podrás pagar con MercadoPago después de confirmar tu reserva.
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</section>

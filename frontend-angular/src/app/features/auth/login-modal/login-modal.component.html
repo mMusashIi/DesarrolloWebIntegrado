@@ -1,0 +1,40 @@
+<div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header" style="background: linear-gradient(135deg, #4c1d95, #6d28d9); color: white;">
+        <h5 class="modal-title fw-bold">🌸 Iniciar Sesión</h5>
+        <button type="button" class="btn-close btn-close-white" (click)="close.emit()"></button>
+      </div>
+      <div class="modal-body p-4">
+        @if (error()) {
+          <div class="alert alert-danger">{{ error() }}</div>
+        }
+        <form [formGroup]="form" (ngSubmit)="submit()">
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Email</label>
+            <input type="email" formControlName="email" class="form-control"
+              [class.is-invalid]="emailCtrl.invalid && emailCtrl.touched"
+              placeholder="tu@email.com">
+            @if (emailCtrl.invalid && emailCtrl.touched) {
+              <div class="invalid-feedback">Ingresa un email válido.</div>
+            }
+          </div>
+          <div class="mb-4">
+            <label class="form-label fw-semibold">Contraseña</label>
+            <input type="password" formControlName="password" class="form-control"
+              [class.is-invalid]="passwordCtrl.invalid && passwordCtrl.touched"
+              placeholder="Tu contraseña">
+            @if (passwordCtrl.invalid && passwordCtrl.touched) {
+              <div class="invalid-feedback">La contraseña es requerida.</div>
+            }
+          </div>
+          <button type="submit" class="btn w-100 fw-bold text-white" [disabled]="loading()"
+            style="background: linear-gradient(135deg, #4c1d95, #6d28d9);">
+            @if (loading()) { <span class="spinner-border spinner-border-sm me-2"></span> }
+            Iniciar Sesión
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

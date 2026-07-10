@@ -1,0 +1,55 @@
+<div class="d-flex" style="min-height: calc(100vh - 56px);">
+  <!-- Sidebar -->
+  <nav class="d-none d-md-flex flex-column p-3 text-white" style="width: 220px; min-width: 220px; background: linear-gradient(180deg, #4c1d95, #3b0764);">
+    <div class="fw-bold mb-4 mt-2 ps-2" style="color: #f9a8d4;">Panel Admin</div>
+    <ul class="nav nav-pills flex-column gap-1">
+      <li class="nav-item">
+        <a routerLink="/admin" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"
+          class="nav-link text-white d-flex align-items-center gap-2">
+          📊 Dashboard
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/admin/paquetes" routerLinkActive="active"
+          class="nav-link text-white d-flex align-items-center gap-2">
+          🏔️ Paquetes
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/admin/inventario" routerLinkActive="active"
+          class="nav-link text-white d-flex align-items-center gap-2">
+          📅 Inventario
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/admin/reservas" routerLinkActive="active"
+          class="nav-link text-white d-flex align-items-center gap-2">
+          📋 Reservas
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/admin/usuarios" routerLinkActive="active"
+          class="nav-link text-white d-flex align-items-center gap-2">
+          👥 Usuarios
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/admin/lugares" routerLinkActive="active"
+          class="nav-link text-white d-flex align-items-center gap-2">
+          📍 Lugares
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/admin/reportes" routerLinkActive="active"
+          class="nav-link text-white d-flex align-items-center gap-2">
+          📈 Reportes
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Main content -->
+  <div class="flex-grow-1 p-4" style="background-color: #f3f4f6; overflow-y: auto;">
+    <router-outlet></router-outlet>
+  </div>
+</div>

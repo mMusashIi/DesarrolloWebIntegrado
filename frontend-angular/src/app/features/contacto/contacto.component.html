@@ -1,0 +1,106 @@
+<!-- Header -->
+<section class="py-4 text-white" style="background: linear-gradient(135deg, #4c1d95, #6d28d9);">
+  <div class="container">
+    <h1 class="fw-bold mb-1">📬 Contáctanos</h1>
+    <p class="opacity-75 mb-0">Estamos aquí para ayudarte a planificar tu viaje perfecto</p>
+  </div>
+</section>
+
+<section class="py-5" style="background-color: #f3f4f6;">
+  <div class="container">
+    <div class="row g-5">
+      <!-- Contact Info -->
+      <div class="col-lg-4">
+        <h4 class="fw-bold mb-4" style="color: #4c1d95;">Información de contacto</h4>
+        <div class="d-flex align-items-start mb-4">
+          <span class="fs-4 me-3">📍</span>
+          <div>
+            <div class="fw-semibold">Dirección</div>
+            <div class="text-muted">Av. El Sol 123, Cusco, Perú</div>
+          </div>
+        </div>
+        <div class="d-flex align-items-start mb-4">
+          <span class="fs-4 me-3">📞</span>
+          <div>
+            <div class="fw-semibold">Teléfono</div>
+            <div class="text-muted">+51 084 123456</div>
+          </div>
+        </div>
+        <div class="d-flex align-items-start mb-4">
+          <span class="fs-4 me-3">📧</span>
+          <div>
+            <div class="fw-semibold">Email</div>
+            <div class="text-muted">info&#64;buganvillatours.com</div>
+          </div>
+        </div>
+        <div class="d-flex align-items-start mb-4">
+          <span class="fs-4 me-3">🕐</span>
+          <div>
+            <div class="fw-semibold">Horario de atención</div>
+            <div class="text-muted">Lun–Sáb: 8:00am – 6:00pm</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact Form -->
+      <div class="col-lg-8">
+        @if (enviado()) {
+          <div class="card p-5 text-center">
+            <div class="display-1 mb-3">✅</div>
+            <h4 class="fw-bold text-success">¡Mensaje enviado!</h4>
+            <p class="text-muted">Nos pondremos en contacto contigo pronto.</p>
+            <button class="btn btn-outline-secondary mt-3" (click)="enviado.set(false); form.reset()">
+              Enviar otro mensaje
+            </button>
+          </div>
+        } @else {
+          <div class="card p-4">
+            <h5 class="fw-bold mb-4">Envíanos un mensaje</h5>
+            <form [formGroup]="form" (ngSubmit)="submit()">
+              <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold">Nombre *</label>
+                  <input type="text" formControlName="nombre" class="form-control"
+                    [class.is-invalid]="field('nombre').invalid && field('nombre').touched">
+                  @if (field('nombre').invalid && field('nombre').touched) {
+                    <div class="invalid-feedback">Nombre requerido.</div>
+                  }
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold">Email *</label>
+                  <input type="email" formControlName="email" class="form-control"
+                    [class.is-invalid]="field('email').invalid && field('email').touched">
+                  @if (field('email').invalid && field('email').touched) {
+                    <div class="invalid-feedback">Email inválido.</div>
+                  }
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Asunto *</label>
+                <input type="text" formControlName="asunto" class="form-control"
+                  [class.is-invalid]="field('asunto').invalid && field('asunto').touched">
+                @if (field('asunto').invalid && field('asunto').touched) {
+                  <div class="invalid-feedback">Asunto requerido.</div>
+                }
+              </div>
+              <div class="mb-4">
+                <label class="form-label fw-semibold">Mensaje * <span class="text-muted small">(mínimo 20 caracteres)</span></label>
+                <textarea formControlName="mensaje" class="form-control" rows="5"
+                  [class.is-invalid]="field('mensaje').invalid && field('mensaje').touched"
+                  placeholder="Cuéntanos cómo podemos ayudarte..."></textarea>
+                @if (field('mensaje').invalid && field('mensaje').touched) {
+                  <div class="invalid-feedback">El mensaje debe tener al menos 20 caracteres.</div>
+                }
+              </div>
+              <button type="submit" class="btn btn-lg w-100 fw-bold text-white" [disabled]="enviando()"
+                style="background: linear-gradient(135deg, #4c1d95, #6d28d9);">
+                @if (enviando()) { <span class="spinner-border spinner-border-sm me-2"></span> }
+                Enviar mensaje
+              </button>
+            </form>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</section>
