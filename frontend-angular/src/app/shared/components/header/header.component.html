@@ -1,7 +1,7 @@
-<nav class="navbar navbar-expand-lg navbar-dark" style="background: linear-gradient(135deg, #4c1d95, #6d28d9);">
+<nav class="navbar navbar-expand-lg navbar-light bg-white" style="box-shadow: 0 4px 6px rgba(0,0,0,0.1); padding: 15px 0;">
   <div class="container">
-    <a class="navbar-brand fw-bold" routerLink="/">
-      <span style="color: #db2777;">🌸</span> Buganvilla Tours
+    <a class="navbar-brand fw-bold fs-4" routerLink="/" style="color: var(--primary-color);">
+      🌸 Buganvilla Tours
     </a>
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -11,21 +11,21 @@
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav me-auto">
         <li class="nav-item">
-          <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Inicio</a>
+          <a class="nav-link fw-500" style="color: #1f2937;" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Inicio</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" routerLink="/paquetes" routerLinkActive="active">Paquetes</a>
+          <a class="nav-link fw-500" style="color: #1f2937;" routerLink="/paquetes" routerLinkActive="active">Paquetes</a>
         </li>
         @if (auth.isAuthenticated()) {
           <li class="nav-item">
-            <a class="nav-link" routerLink="/reservas" routerLinkActive="active">Reservar</a>
+            <a class="nav-link fw-500" style="color: #1f2937;" routerLink="/reservas" routerLinkActive="active">Reservar</a>
           </li>
         }
         <li class="nav-item">
-          <a class="nav-link" routerLink="/nosotros" routerLinkActive="active">Nosotros</a>
+          <a class="nav-link fw-500" style="color: #1f2937;" routerLink="/nosotros" routerLinkActive="active">Nosotros</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" routerLink="/contacto" routerLinkActive="active">Contacto</a>
+          <a class="nav-link fw-500" style="color: #1f2937;" routerLink="/contacto" routerLinkActive="active">Contacto</a>
         </li>
       </ul>
 
@@ -37,7 +37,9 @@
             </a>
           }
           <div class="dropdown">
-            <button class="btn btn-sm btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
+            <button class="btn btn-sm fw-bold dropdown-toggle"
+              style="background: white; color: var(--primary-color); border: 2px solid var(--primary-color); border-radius: 50px; padding: 8px 20px;"
+              type="button" data-bs-toggle="dropdown">
               {{ auth.currentUser()?.nombre }} {{ auth.currentUser()?.apellido }}
             </button>
             <ul class="dropdown-menu dropdown-menu-end">
@@ -51,12 +53,14 @@
             </ul>
           </div>
         } @else {
-          <button class="btn btn-sm btn-outline-light" (click)="openLogin()">
+          <button class="btn btn-sm fw-bold" (click)="openLogin()"
+            style="background: white; color: var(--primary-color); border: 2px solid var(--primary-color); border-radius: 50px; padding: 8px 20px;">
             Iniciar sesión
           </button>
-          <a routerLink="/register" class="btn btn-sm" style="background-color: #db2777; color: white;">
+          <button class="btn btn-sm fw-bold" (click)="openRegister()"
+            style="background-color: var(--primary-color); color: white; border-radius: 50px; padding: 8px 20px; border: none;">
             Registrarse
-          </a>
+          </button>
         }
       </div>
     </div>

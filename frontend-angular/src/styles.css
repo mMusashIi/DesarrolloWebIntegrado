@@ -1,11 +1,11 @@
 @import 'bootstrap/dist/css/bootstrap.min.css';
 
 :root {
-  --primary-color: #4c1d95;
-  --primary-dark: #3b1570;
-  --primary-light: #6d28d9;
-  --accent-color: #db2777;
-  --accent-dark: #be185d;
+  --primary-color: #9333ea;
+  --primary-dark: #7c3aed;
+  --primary-light: #a855f7;
+  --accent-color: #a855f7;
+  --accent-dark: #9333ea;
   --text-dark: #1f2937;
   --text-muted: #6b7280;
   --bg-color: #f3f4f6;

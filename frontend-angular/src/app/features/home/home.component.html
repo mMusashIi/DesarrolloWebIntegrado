@@ -1,29 +1,33 @@
-<!-- HERO SECTION -->
-<section class="hero-gradient text-white py-5" style="min-height: 85vh; display: flex; align-items: center;">
-  <div class="container">
-    <div class="row align-items-center">
-      <div class="col-lg-6">
-        <span class="badge mb-3 px-3 py-2 fw-semibold" style="background: rgba(219,39,119,0.2); color: #db2777; font-size: 0.9rem;">
-          🌸 Explorando el Perú
-        </span>
-        <h1 class="display-4 fw-bold mb-4">
-          Descubre la Magia del <span style="color: #f9a8d4;">Cusco</span>
-        </h1>
-        <p class="lead mb-4 opacity-75">
-          Vive experiencias únicas en los destinos más increíbles del Perú. Tours guiados, precios accesibles y recuerdos para siempre.
+<!-- HERO SECTION — video de fondo igual que React -->
+<section id="home" class="position-relative overflow-hidden" style="min-height: 100vh; display: flex; align-items: center;">
+
+  <!-- Video de fondo -->
+  <div class="position-absolute top-0 start-0 w-100 h-100" style="z-index: 0; overflow: hidden;">
+    <video autoplay loop muted playsinline
+      style="min-width:100%; min-height:100%; width:auto; height:auto; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); object-fit:cover;">
+      <source src="/videos/ica-loop.mp4" type="video/mp4">
+    </video>
+    <!-- Overlay morado -->
+    <div class="position-absolute top-0 start-0 w-100 h-100" style="background: rgba(40,2,70,0.65); z-index: 1;"></div>
+  </div>
+
+  <!-- Contenido -->
+  <div class="container position-relative text-white" style="z-index: 2; padding-top: 80px; padding-bottom: 80px;">
+    <div class="row w-100">
+      <div class="col-lg-10 col-xl-8">
+        <h1 class="display-4 fw-bold mb-4">Descubre la Magia de Ica</h1>
+        <p class="lead fw-light mb-5" style="font-size: 1.25rem;">
+          Experiencias turísticas personalizadas, confiables y memorables en Ica,
+          Paracas y Nazca. Combina cultura, naturaleza y aventura con nosotros.
         </p>
-        <div class="d-flex gap-3 flex-wrap">
-          <a routerLink="/paquetes" class="btn btn-lg fw-bold" style="background: #db2777; color: white; border-radius: 30px; padding: 0.75rem 2rem;">
-            Ver Paquetes
+        <div class="d-flex flex-wrap gap-3">
+          <a routerLink="/paquetes" class="btn btn-light btn-lg fw-bold" style="color: var(--primary-color);">
+            <i class="fas fa-map-marked-alt me-2"></i>Ver Paquetes
           </a>
-          <a routerLink="/nosotros" class="btn btn-lg btn-outline-light fw-bold" style="border-radius: 30px; padding: 0.75rem 2rem;">
-            Conócenos
+          <a routerLink="/reservas" class="btn btn-outline-light btn-lg fw-bold">
+            <i class="fas fa-calendar-plus me-2"></i>Reservar Ahora
           </a>
         </div>
-      </div>
-      <div class="col-lg-6 d-none d-lg-block text-center">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Machu_Picchu%2C_Peru.jpg/800px-Machu_Picchu%2C_Peru.jpg"
-          alt="Machu Picchu" class="img-fluid rounded-4 shadow-lg" style="max-height: 500px; object-fit: cover;">
       </div>
     </div>
   </div>
@@ -37,7 +41,7 @@
         <div class="col-6 col-md-3">
           <div class="p-3">
             <div class="display-5 mb-1">{{ stat.icon }}</div>
-            <div class="display-6 fw-bold" style="color: #4c1d95;">{{ stat.value }}</div>
+            <div class="display-6 fw-bold" style="color: var(--primary-color);">{{ stat.value }}</div>
             <div class="text-muted">{{ stat.label }}</div>
           </div>
         </div>
@@ -47,11 +51,11 @@
 </section>
 
 <!-- FEATURED PACKAGES -->
-<section class="py-5" style="background-color: #f3f4f6;">
+<section class="py-5" style="background-color: #f9fafb;">
   <div class="container">
     <div class="text-center mb-5">
       <h2 class="section-title">Nuestros Paquetes Destacados</h2>
-      <p class="section-subtitle">Experiencias diseñadas para que nunca olvides tu visita al Perú</p>
+      <p class="section-subtitle">Experiencias diseñadas para que nunca olvides tu visita a Ica</p>
     </div>
 
     @if (loading()) {
@@ -69,10 +73,10 @@
                 class="card-img-top" style="height: 220px; object-fit: cover;">
               <div class="card-body d-flex flex-column">
                 <div class="d-flex justify-content-between align-items-start mb-2">
-                  <span class="badge" style="background: #ede9fe; color: #4c1d95;">
-                    {{ paquete.lugar?.ciudad || 'Cusco' }}
+                  <span class="badge" style="background: #f3e8ff; color: var(--primary-color);">
+                    {{ paquete.lugar?.ciudad || 'Ica' }}
                   </span>
-                  <span class="badge" style="background: #fce7f3; color: #db2777;">
+                  <span class="badge" style="background: #f0fdf4; color: #15803d;">
                     {{ paquete.duracionDias }} día(s)
                   </span>
                 </div>
@@ -81,7 +85,7 @@
                   {{ paquete.descripcion | slice:0:100 }}{{ (paquete.descripcion?.length ?? 0) > 100 ? '...' : '' }}
                 </p>
                 <div class="d-flex justify-content-between align-items-center mt-3">
-                  <span class="fs-5 fw-bold" style="color: #4c1d95;">
+                  <span class="fs-5 fw-bold" style="color: var(--primary-color);">
                     S/ {{ paquete.precioBase | number:'1.2-2' }}
                   </span>
                   <span class="text-muted small">
@@ -122,7 +126,7 @@
             <p class="text-muted fst-italic mb-3">"{{ t.texto }}"</p>
             <div class="d-flex align-items-center">
               <div class="rounded-circle text-white fw-bold d-flex align-items-center justify-content-center me-3"
-                style="width:40px; height:40px; background: #4c1d95; min-width:40px;">
+                style="width:40px; height:40px; background: var(--primary-color); min-width:40px;">
                 {{ t.nombre[0] }}
               </div>
               <div>
@@ -138,12 +142,49 @@
 </section>
 
 <!-- CTA SECTION -->
-<section class="py-5 text-white" style="background: linear-gradient(135deg, #4c1d95, #db2777);">
-  <div class="container text-center">
-    <h2 class="display-6 fw-bold mb-3">¿Listo para tu próxima aventura?</h2>
-    <p class="lead mb-4 opacity-75">Únete a miles de viajeros que ya descubrieron el Perú con nosotros</p>
-    <a routerLink="/paquetes" class="btn btn-lg btn-light fw-bold" style="border-radius: 30px; padding: 0.75rem 2.5rem;">
-      Explorar Paquetes
-    </a>
+<section class="py-5 text-white" style="background-color: var(--primary-color);">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-8">
+        <h3 class="mb-3 text-white">¿Listo para vivir tu aventura en Ica?</h3>
+        <p class="mb-0 text-white-50">Contáctanos y planifiquemos juntos tu experiencia perfecta.</p>
+      </div>
+      <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+        <a routerLink="/contacto" class="btn btn-light btn-lg fw-bold" style="color: var(--primary-color);">
+          <i class="fas fa-envelope me-2"></i>Contáctanos
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MAP SECTION -->
+<section class="py-5 bg-white">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-10 text-center mb-5">
+        <h2 class="section-title mb-3">Conoce la magia de Ica con Nosotros</h2>
+        <p class="section-subtitle fw-light fs-5 text-muted">
+          Visita nuestra sede principal para planificar tu itinerario perfecto. Somos el punto donde
+          la cultura, la naturaleza y la aventura se unen para crear tu experiencia inolvidable.
+        </p>
+        <p class="lead fw-bold text-primary-custom">
+          ¡Nuestro equipo de expertos te espera en el corazón de Ica para una asesoría personalizada!
+        </p>
+      </div>
+    </div>
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+        <div class="card-custom overflow-hidden shadow-lg" style="height: 450px; border-radius: 20px;">
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d241.90633260137923!2d-75.7515166059221!3d-14.04754801787607!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9110e2d347f27643%3A0x6a1c6324680980eb!2sBuganvilla%20Tours!5e0!3m2!1ses-419!2spe!4v1765087176809!5m2!1ses-419!2spe"
+            width="100%" height="100%" style="border: 0;"
+            allowfullscreen loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            title="Mapa de Buganvilla Tours">
+          </iframe>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
