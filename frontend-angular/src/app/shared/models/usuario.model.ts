@@ -6,7 +6,7 @@ export interface Usuario {
   telefono?: string;
   nacionalidad?: string;
   dni?: string;
-  rol: 'admin' | 'cliente';
+  rol?: 'admin' | 'cliente';
   activo: boolean;
 }
 

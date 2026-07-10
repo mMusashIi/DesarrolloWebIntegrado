@@ -3,11 +3,11 @@ import { Lugar } from './lugar.model';
 export interface Paquete {
   idPaquete: number;
   nombrePaquete: string;
-  descripcion: string;
+  descripcion?: string;
   precioBase: number;
-  duracionDias: number;
+  duracionDias?: number;
   estado: 'activo' | 'inactivo';
-  lugar: Lugar;
+  lugar?: Lugar;
 }
 
 export interface PaqueteRequest {
