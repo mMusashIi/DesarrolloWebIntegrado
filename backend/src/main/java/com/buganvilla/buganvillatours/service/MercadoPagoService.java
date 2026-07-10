@@ -6,6 +6,7 @@ import com.buganvilla.buganvillatours.model.entity.Reserva;
 import com.buganvilla.buganvillatours.model.entity.Usuario;
 import com.buganvilla.buganvillatours.repository.PagoRepository;
 import com.buganvilla.buganvillatours.repository.ReservaRepository;
+import com.buganvilla.buganvillatours.whatsapp.WhatsAppNotificationService;
 import com.mercadopago.client.payment.PaymentClient;
 import com.mercadopago.client.preference.PreferenceBackUrlsRequest;
 import com.mercadopago.client.preference.PreferenceClient;
@@ -31,7 +32,7 @@ public class MercadoPagoService {
 
     private final ReservaRepository reservaRepository;
     private final PagoRepository pagoRepository;
-    private final OpenWAService openWAService;
+    private final WhatsAppNotificationService whatsAppNotificationService;
 
     @Value("${mercadopago.back-url.success}")
     private String backUrlSuccess;
@@ -186,15 +187,14 @@ public class MercadoPagoService {
                 log.info("Pago {} aprobado → confirmando reserva {}", paymentId, reservaId);
                 pago.procesarPago();
                 
-                // Enviar confirmación por WhatsApp
+                // Enviar confirmación por WhatsApp (async, no bloquea el webhook)
                 Usuario usuario = pago.getReserva().getUsuario();
                 if (usuario != null && usuario.getTelefono() != null) {
-                    String paqueteNombre = pago.getReserva().getInventario().getPaquete().getNombrePaquete();
-                    String mensaje = String.format(
-                        "¡Hola %s! Hemos recibido tu pago y tu reserva para el paquete *%s* (Reserva #%d) ha sido CONFIRMADA. ¡Gracias por elegir Buganvilla Tours!",
-                        usuario.getNombre(), paqueteNombre, reservaId);
-                    
-                    new Thread(() -> openWAService.sendTextMessage(usuario.getTelefono(), mensaje)).start();
+                    whatsAppNotificationService.notifyPaymentConfirmation(
+                            usuario.getTelefono(),
+                            usuario.getNombre(),
+                            pago.getMonto(),
+                            String.valueOf(reservaId));
                 }
             }
             case "rejected", "cancelled" -> {
