@@ -2,6 +2,7 @@ import { Component, EventEmitter, Output, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/auth/auth.service';
+import { NATIONAL_PHONE_PATTERN, PHONE_COUNTRIES, toE164 } from '../../../shared/data/phone-countries';
 
 @Component({
   selector: 'app-register-modal',
@@ -15,14 +16,16 @@ export class RegisterModalComponent {
 
   private fb = inject(FormBuilder);
   auth = inject(AuthService);
+  countries = PHONE_COUNTRIES;
 
   form: FormGroup = this.fb.group({
     nombre: ['', [Validators.required, Validators.minLength(2)]],
     apellido: ['', [Validators.required, Validators.minLength(2)]],
     email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(6)]],
-    telefono: ['', Validators.required],
-    nacionalidad: ['', Validators.required]
+    password: ['', [Validators.required, Validators.minLength(8)]],
+    prefijoTelefono: ['+51', Validators.required],
+    telefono: ['', [Validators.required, Validators.pattern(NATIONAL_PHONE_PATTERN)]],
+    nacionalidad: ['Perú', Validators.required]
   });
 
   loading = signal(false);
@@ -32,7 +35,16 @@ export class RegisterModalComponent {
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }
     this.loading.set(true);
     this.error.set('');
-    this.auth.register(this.form.value).subscribe({
+    const value = this.form.value;
+    const request = {
+      nombre: value.nombre,
+      apellido: value.apellido,
+      email: value.email,
+      password: value.password,
+      telefono: toE164(value.prefijoTelefono, value.telefono),
+      nacionalidad: value.nacionalidad
+    };
+    this.auth.register(request).subscribe({
       next: () => {
         this.loading.set(false);
         this.success.emit();

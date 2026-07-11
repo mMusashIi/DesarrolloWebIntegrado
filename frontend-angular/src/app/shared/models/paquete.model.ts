@@ -8,6 +8,10 @@ export interface Paquete {
   duracionDias?: number;
   estado: 'activo' | 'inactivo';
   lugar?: Lugar;
+  idLugar?: number;
+  nombreLugar?: string;
+  ciudadLugar?: string;
+  imagenUrl?: string;
 }
 
 export interface PaqueteRequest {
@@ -17,6 +21,7 @@ export interface PaqueteRequest {
   duracionDias: number;
   estado: string;
   idLugar: number;
+  imagenUrl?: string;
 }
 
 export interface PaqueteSearchParams {

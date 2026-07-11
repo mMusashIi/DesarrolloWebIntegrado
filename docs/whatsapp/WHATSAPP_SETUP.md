@@ -37,7 +37,7 @@ Copiar `.env.example` como `.env` y rellenar:
 ```env
 WHATSAPP_ENABLED=true
 WHATSAPP_PROVIDER=meta
-WHATSAPP_PHONE_NUMBER_ID=<ID del número en Meta>
+WHATSAPP_PHONE_NUMBER_ID=<opcional; se descubre automáticamente con el token>
 WHATSAPP_ACCESS_TOKEN=<token de acceso de larga duración>
 WHATSAPP_VERIFY_TOKEN=<token aleatorio para verificar webhook>
 WHATSAPP_APP_SECRET=<App Secret de la app en Meta>
@@ -62,8 +62,8 @@ curl "https://tu-dominio.com/api/whatsapp/webhook?hub.mode=subscribe&hub.verify_
 | `WHATSAPP_ENABLED` | `true` o `false` | Sí |
 | `WHATSAPP_PROVIDER` | `meta` o `mock` | Sí |
 | `WHATSAPP_API_BASE_URL` | Base URL de Graph API | No (default: `https://graph.facebook.com`) |
-| `WHATSAPP_API_VERSION` | Versión de la API | No (default: `v18.0`) |
-| `WHATSAPP_PHONE_NUMBER_ID` | ID del número de WhatsApp Business | Sí |
+| `WHATSAPP_API_VERSION` | Versión de la API | No (default: `v25.0`) |
+| `WHATSAPP_PHONE_NUMBER_ID` | ID del número de WhatsApp Business | No; se descubre automáticamente |
 | `WHATSAPP_BUSINESS_ACCOUNT_ID` | ID de la cuenta business | Para reportes |
 | `WHATSAPP_ACCESS_TOKEN` | Token de acceso (larga duración) | Sí |
 | `WHATSAPP_VERIFY_TOKEN` | Token para verificar webhook | Para webhooks |

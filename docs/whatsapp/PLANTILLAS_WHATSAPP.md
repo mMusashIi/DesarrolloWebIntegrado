@@ -74,4 +74,4 @@ Buganvilla Tours 🌺
 - Las plantillas solo pueden enviarse a números que hayan optado por recibirlas (opt-in).
 - En entorno de prueba (sandbox de Meta), solo se pueden enviar mensajes a números registrados en el sandbox.
 - El tiempo de aprobación de plantillas suele ser 24-72 horas.
-- La implementación real de envío de plantillas está marcada como `TODO` en `MetaWhatsAppCloudProvider.java`.
+- El envío real y el descubrimiento automático de la cuenta WABA/número emisor están implementados en `MetaWhatsAppCloudProvider.java`.

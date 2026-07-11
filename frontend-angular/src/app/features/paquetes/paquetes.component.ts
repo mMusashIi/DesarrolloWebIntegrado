@@ -64,11 +64,12 @@ export class PaquetesComponent implements OnInit {
   }
 
   getImageUrl(paquete: Paquete): string {
+    if (paquete.imagenUrl) return paquete.imagenUrl;
     const nombre = paquete.nombrePaquete?.toLowerCase() || '';
-    if (nombre.includes('machu')) return 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Machu_Picchu%2C_Peru.jpg/800px-Machu_Picchu%2C_Peru.jpg';
-    if (nombre.includes('vinicunca') || nombre.includes('color')) return 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Rainbow_Mountain_Peru.jpg/800px-Rainbow_Mountain_Peru.jpg';
-    if (nombre.includes('valle')) return 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Pisac01.jpg/800px-Pisac01.jpg';
-    return 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Cusco.jpg/800px-Cusco.jpg';
+    if (nombre.includes('nazca') || nombre.includes('líneas')) return '/images/nazcaLineas.png';
+    if (nombre.includes('ballestas') || nombre.includes('paracas')) return '/images/islas-ballestas.png';
+    if (nombre.includes('huacachina')) return '/images/huacachina.png';
+    return '/images/placeholder.jpg';
   }
 
   openModal(paquete: Paquete): void {

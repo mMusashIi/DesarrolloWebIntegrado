@@ -24,6 +24,14 @@ export interface RegisterRequest {
   nacionalidad: string;
 }
 
+export interface ProfileUpdateRequest {
+  nombre: string;
+  apellido: string;
+  telefono: string;
+  nacionalidad: string;
+  dni?: string;
+}
+
 export interface AuthResponse {
   token: string;
   usuario: Usuario;

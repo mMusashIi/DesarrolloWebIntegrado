@@ -1,82 +1,267 @@
 services:
 
   sqlserver:
+    restart: unless-stopped
     build:
       context: ./docker
       dockerfile: sqlserver.Dockerfile
+
     environment:
-      SA_PASSWORD: "${DB_PASSWORD:-BuganvillaT0urs!Dev}"
       ACCEPT_EULA: "Y"
       MSSQL_PID: "Express"
+      MSSQL_SA_PASSWORD: "${DB_PASSWORD:-BuganvillaT0urs!Dev}"
+      SA_PASSWORD: "${DB_PASSWORD:-BuganvillaT0urs!Dev}"
+
     ports:
       - "1433:1433"
+
     volumes:
       - sqlserver_data:/var/opt/mssql
+
     networks:
       - buganvilla-net
+
     healthcheck:
-      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"${DB_PASSWORD:-BuganvillaT0urs!Dev}\" -No -Q \"SELECT name FROM sys.databases WHERE name='BuganvillaTours1'\" | grep -q BuganvillaTours1 || exit 1"]
-      interval: 15s
-      timeout: 10s
-      retries: 15
+      test:
+        - CMD-SHELL
+        - >-
+          /opt/mssql-tools18/bin/sqlcmd
+          -S 127.0.0.1,1433
+          -U sa
+          -P "$${MSSQL_SA_PASSWORD}"
+          -C
+          -l 10
+          -t 10
+          -b
+          -Q "IF DB_ID('BuganvillaAuth') IS NULL OR DB_ID('BuganvillaCatalogo') IS NULL OR DB_ID('BuganvillaInventario') IS NULL OR DB_ID('BuganvillaReservas') IS NULL OR DB_ID('BuganvillaPagos') IS NULL THROW 50000, 'Databases not ready', 1; SELECT 1"
+      interval: 5s
+      timeout: 15s
+      retries: 20
       start_period: 60s
 
-  backend:
+  auth-service:
+    restart: unless-stopped
     build:
-      context: ./backend
+      context: ./auth-service
       dockerfile: Dockerfile
-    env_file:
-      - path: .env
-        required: false
     environment:
-      DB_URL: "jdbc:sqlserver://sqlserver:1433;databaseName=BuganvillaTours1;encrypt=true;trustServerCertificate=true;"
+      DB_URL: "jdbc:sqlserver://sqlserver:1433;databaseName=BuganvillaAuth;encrypt=true;trustServerCertificate=true;"
       DB_USERNAME: "sa"
       DB_PASSWORD: "${DB_PASSWORD:-BuganvillaT0urs!Dev}"
       JWT_SECRET: "${JWT_SECRET:-mySuperSecretKeyForBuganvillaToursApplication2024SecurityWithSpringBoot3}"
-      JWT_EXPIRATION: "86400000"
-      CORS_ALLOWED_ORIGINS: "http://localhost,http://localhost:80"
-      SHOW_SQL: "false"
-      LOG_LEVEL: "INFO"
-      WHATSAPP_ENABLED: "${WHATSAPP_ENABLED:-false}"
-      WHATSAPP_PROVIDER: "${WHATSAPP_PROVIDER:-mock}"
-      WHATSAPP_API_BASE_URL: "https://graph.facebook.com"
-      WHATSAPP_API_VERSION: "${WHATSAPP_API_VERSION:-v18.0}"
-      WHATSAPP_PHONE_NUMBER_ID: "${WHATSAPP_PHONE_NUMBER_ID:-}"
-      WHATSAPP_ACCESS_TOKEN: "${WHATSAPP_ACCESS_TOKEN:-}"
-      WHATSAPP_VERIFY_TOKEN: "${WHATSAPP_VERIFY_TOKEN:-}"
-      WHATSAPP_APP_SECRET: "${WHATSAPP_APP_SECRET:-}"
-      WHATSAPP_DEFAULT_LANGUAGE: "${WHATSAPP_DEFAULT_LANGUAGE:-es_ES}"
-      # Tokens externos: se leen de .env si existe, vacío si no (app arranca igual, sin esa funcionalidad)
-      APIS_NET_TOKEN: "${APIS_NET_TOKEN:-}"
-      MP_ACCESS_TOKEN: "${MP_ACCESS_TOKEN:-}"
-      MP_PUBLIC_KEY: "${MP_PUBLIC_KEY:-}"
-      MP_BACK_URL_SUCCESS: "${MP_BACK_URL_SUCCESS:-http://localhost:8080/api/mercadopago/pago-exitoso}"
-      MP_BACK_URL_FAILURE: "${MP_BACK_URL_FAILURE:-http://localhost:8080/api/mercadopago/pago-fallido}"
-      MP_BACK_URL_PENDING: "${MP_BACK_URL_PENDING:-http://localhost:8080/api/mercadopago/pago-fallido}"
-      MP_NOTIFICATION_URL: "${MP_NOTIFICATION_URL:-}"
+      JWT_EXPIRATION: "${JWT_EXPIRATION:-86400000}"
+      CORS_ALLOWED_ORIGINS: "${CORS_ALLOWED_ORIGINS:-http://localhost,http://localhost:80,http://localhost:4200}"
+      LOG_LEVEL: "${LOG_LEVEL:-INFO}"
     ports:
-      - "8080:8080"
+      - "8081:8081"
     depends_on:
       sqlserver:
         condition: service_healthy
     networks:
       - buganvilla-net
-    healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health || exit 1"]
-      interval: 20s
-      timeout: 10s
-      retries: 5
-      start_period: 90s
 
-  frontend:
+  catalogo-service:
+    restart: unless-stopped
+    build:
+      context: ./catalogo-service
+      dockerfile: Dockerfile
+    environment:
+      DB_URL: "jdbc:sqlserver://sqlserver:1433;databaseName=BuganvillaCatalogo;encrypt=true;trustServerCertificate=true;"
+      DB_USERNAME: "sa"
+      DB_PASSWORD: "${DB_PASSWORD:-BuganvillaT0urs!Dev}"
+      JWT_SECRET: "${JWT_SECRET:-mySuperSecretKeyForBuganvillaToursApplication2024SecurityWithSpringBoot3}"
+      JWT_EXPIRATION: "${JWT_EXPIRATION:-86400000}"
+      CORS_ALLOWED_ORIGINS: "${CORS_ALLOWED_ORIGINS:-http://localhost,http://localhost:80,http://localhost:4200}"
+      LOG_LEVEL: "${LOG_LEVEL:-INFO}"
+    ports:
+      - "8082:8082"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    networks:
+      - buganvilla-net
+
+  inventario-service:
+    restart: unless-stopped
+    build:
+      context: ./inventario-service
+      dockerfile: Dockerfile
+    environment:
+      DB_URL: "jdbc:sqlserver://sqlserver:1433;databaseName=BuganvillaInventario;encrypt=true;trustServerCertificate=true;"
+      DB_USERNAME: "sa"
+      DB_PASSWORD: "${DB_PASSWORD:-BuganvillaT0urs!Dev}"
+      JWT_SECRET: "${JWT_SECRET:-mySuperSecretKeyForBuganvillaToursApplication2024SecurityWithSpringBoot3}"
+      JWT_EXPIRATION: "${JWT_EXPIRATION:-86400000}"
+      INTERNAL_SERVICE_TOKEN: "${INTERNAL_SERVICE_TOKEN:-dev-internal-token-change-me}"
+      CORS_ALLOWED_ORIGINS: "${CORS_ALLOWED_ORIGINS:-http://localhost,http://localhost:80,http://localhost:4200}"
+      LOG_LEVEL: "${LOG_LEVEL:-INFO}"
+    ports:
+      - "8083:8083"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    networks:
+      - buganvilla-net
+
+  reserva-service:
+    restart: unless-stopped
+    build:
+      context: ./reserva-service
+      dockerfile: Dockerfile
+    environment:
+      DB_URL: "jdbc:sqlserver://sqlserver:1433;databaseName=BuganvillaReservas;encrypt=true;trustServerCertificate=true;"
+      DB_USERNAME: "sa"
+      DB_PASSWORD: "${DB_PASSWORD:-BuganvillaT0urs!Dev}"
+      JWT_SECRET: "${JWT_SECRET:-mySuperSecretKeyForBuganvillaToursApplication2024SecurityWithSpringBoot3}"
+      JWT_EXPIRATION: "${JWT_EXPIRATION:-86400000}"
+      INTERNAL_SERVICE_TOKEN: "${INTERNAL_SERVICE_TOKEN:-dev-internal-token-change-me}"
+      INVENTARIO_SERVICE_URL: "http://inventario-service:8083"
+      NOTIFICACION_SERVICE_URL: "http://notificacion-service:8086"
+      CORS_ALLOWED_ORIGINS: "${CORS_ALLOWED_ORIGINS:-http://localhost,http://localhost:80,http://localhost:4200}"
+      LOG_LEVEL: "${LOG_LEVEL:-INFO}"
+    ports:
+      - "8084:8084"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      inventario-service:
+        condition: service_started
+      notificacion-service:
+        condition: service_started
+    networks:
+      - buganvilla-net
+
+  pago-service:
+    restart: unless-stopped
+    build:
+      context: ./pago-service
+      dockerfile: Dockerfile
+    environment:
+      DB_URL: "jdbc:sqlserver://sqlserver:1433;databaseName=BuganvillaPagos;encrypt=true;trustServerCertificate=true;"
+      DB_USERNAME: "sa"
+      DB_PASSWORD: "${DB_PASSWORD:-BuganvillaT0urs!Dev}"
+      JWT_SECRET: "${JWT_SECRET:-mySuperSecretKeyForBuganvillaToursApplication2024SecurityWithSpringBoot3}"
+      JWT_EXPIRATION: "${JWT_EXPIRATION:-86400000}"
+      INTERNAL_SERVICE_TOKEN: "${INTERNAL_SERVICE_TOKEN:-dev-internal-token-change-me}"
+      RESERVA_SERVICE_URL: "http://reserva-service:8084"
+      INVENTARIO_SERVICE_URL: "http://inventario-service:8083"
+      CATALOGO_SERVICE_URL: "http://catalogo-service:8082"
+      NOTIFICACION_SERVICE_URL: "http://notificacion-service:8086"
+      CORS_ALLOWED_ORIGINS: "${CORS_ALLOWED_ORIGINS:-http://localhost,http://localhost:80,http://localhost:4200}"
+      LOG_LEVEL: "${LOG_LEVEL:-INFO}"
+      MP_ACCESS_TOKEN: "${MP_ACCESS_TOKEN:-}"
+      MP_PUBLIC_KEY: "${MP_PUBLIC_KEY:-}"
+      MP_BACK_URL_SUCCESS: "${MP_BACK_URL_SUCCESS:-http://localhost:4200/reservas?payment=success}"
+      MP_BACK_URL_FAILURE: "${MP_BACK_URL_FAILURE:-http://localhost:4200/reservas?payment=failure}"
+      MP_BACK_URL_PENDING: "${MP_BACK_URL_PENDING:-http://localhost:4200/reservas?payment=pending}"
+      MP_NOTIFICATION_URL: "${MP_NOTIFICATION_URL:-http://localhost:8080/api/mercadopago/webhook}"
+    ports:
+      - "8085:8085"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      reserva-service:
+        condition: service_started
+      notificacion-service:
+        condition: service_started
+    networks:
+      - buganvilla-net
+
+  notificacion-service:
+    restart: unless-stopped
+    build:
+      context: ./notificacion-service
+      dockerfile: Dockerfile
+    environment:
+      JWT_SECRET: "${JWT_SECRET:-mySuperSecretKeyForBuganvillaToursApplication2024SecurityWithSpringBoot3}"
+      INTERNAL_SERVICE_TOKEN: "${INTERNAL_SERVICE_TOKEN:-dev-internal-token-change-me}"
+      CORS_ALLOWED_ORIGINS: "${CORS_ALLOWED_ORIGINS:-http://localhost,http://localhost:80,http://localhost:4200}"
+      LOG_LEVEL: "${LOG_LEVEL:-INFO}"
+      WHATSAPP_ENABLED: "${WHATSAPP_ENABLED:-false}"
+      WHATSAPP_PROVIDER: "${WHATSAPP_PROVIDER:-mock}"
+      WHATSAPP_API_BASE_URL: "${WHATSAPP_API_BASE_URL:-https://graph.facebook.com}"
+      WHATSAPP_API_VERSION: "${WHATSAPP_API_VERSION:-v25.0}"
+      WHATSAPP_PHONE_NUMBER_ID: "${WHATSAPP_PHONE_NUMBER_ID:-}"
+      WHATSAPP_BUSINESS_ACCOUNT_ID: "${WHATSAPP_BUSINESS_ACCOUNT_ID:-}"
+      WHATSAPP_ACCESS_TOKEN: "${WHATSAPP_ACCESS_TOKEN:-}"
+      WHATSAPP_VERIFY_TOKEN: "${WHATSAPP_VERIFY_TOKEN:-}"
+      WHATSAPP_APP_SECRET: "${WHATSAPP_APP_SECRET:-}"
+      WHATSAPP_DEFAULT_LANGUAGE: "${WHATSAPP_DEFAULT_LANGUAGE:-es_ES}"
+      APIS_NET_TOKEN: "${APIS_NET_TOKEN:-}"
+      APIS_NET_BASE_URL: "${APIS_NET_BASE_URL:-https://api.decolecta.com/v1}"
+    ports:
+      - "8086:8086"
+    networks:
+      - buganvilla-net
+
+  reporte-service:
+    restart: unless-stopped
+    build:
+      context: ./reporte-service
+      dockerfile: Dockerfile
+    environment:
+      JWT_SECRET: "${JWT_SECRET:-mySuperSecretKeyForBuganvillaToursApplication2024SecurityWithSpringBoot3}"
+      JWT_EXPIRATION: "${JWT_EXPIRATION:-86400000}"
+      RESERVA_SERVICE_URL: "http://reserva-service:8084"
+      PAGO_SERVICE_URL: "http://pago-service:8085"
+      CORS_ALLOWED_ORIGINS: "${CORS_ALLOWED_ORIGINS:-http://localhost,http://localhost:80,http://localhost:4200}"
+      LOG_LEVEL: "${LOG_LEVEL:-INFO}"
+    ports:
+      - "8087:8087"
+    depends_on:
+      reserva-service:
+        condition: service_started
+      pago-service:
+        condition: service_started
+    networks:
+      - buganvilla-net
+
+  api-gateway:
+    restart: unless-stopped
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    environment:
+      JWT_SECRET: "${JWT_SECRET:-mySuperSecretKeyForBuganvillaToursApplication2024SecurityWithSpringBoot3}"
+      CORS_ALLOWED_ORIGINS: "${CORS_ALLOWED_ORIGINS:-http://localhost,http://localhost:80,http://localhost:4200}"
+      LOG_LEVEL: "${LOG_LEVEL:-INFO}"
+      AUTH_SERVICE_URL: "http://auth-service:8081"
+      CATALOGO_SERVICE_URL: "http://catalogo-service:8082"
+      INVENTARIO_SERVICE_URL: "http://inventario-service:8083"
+      RESERVA_SERVICE_URL: "http://reserva-service:8084"
+      PAGO_SERVICE_URL: "http://pago-service:8085"
+      NOTIFICACION_SERVICE_URL: "http://notificacion-service:8086"
+      REPORTE_SERVICE_URL: "http://reporte-service:8087"
+    ports:
+      - "8080:8080"
+    depends_on:
+      auth-service:
+        condition: service_started
+      catalogo-service:
+        condition: service_started
+      inventario-service:
+        condition: service_started
+      reserva-service:
+        condition: service_started
+      pago-service:
+        condition: service_started
+      notificacion-service:
+        condition: service_started
+      reporte-service:
+        condition: service_started
+    networks:
+      - buganvilla-net
+
+  frontend-angular:
+    restart: unless-stopped
     build:
       context: ./frontend-angular
       dockerfile: Dockerfile
     ports:
-      - "80:80"
+      - "4200:80"
     depends_on:
-      backend:
-        condition: service_healthy
+      api-gateway:
+        condition: service_started
     networks:
       - buganvilla-net
 

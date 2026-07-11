@@ -1,65 +1,98 @@
-# Plan de Rollback — Modernización Buganvilla Tours
+# Plan de rollback - Buganvilla Tours
 
-## Checkpoints disponibles
+Este documento aplica al estado actual con 8 microservicios, API Gateway,
+SQL Server y frontend Angular.
 
-| Tag/Rama | Descripción |
-|----------|-------------|
-| `baseline-v1.0` | Estado inicial antes de la modernización |
-| `react-backup` | Copia del frontend React (crear antes de eliminar `frontend/`) |
-| `master` | Rama principal (producción) |
-| `feature/resynced` | Estado del proyecto antes del refactor |
-| `refactor/angular-backend-whatsapp` | Rama de trabajo actual |
+## Regla principal
 
-## Rollback por fase
-
-### Volver al estado inicial (completo)
+Antes de desplegar, crear un tag o rama del estado estable:
 
 ```bash
-git checkout baseline-v1.0
-# O para volver a la rama original:
-git checkout feature/resynced
+git tag pre-microservices-stable
+git push origin pre-microservices-stable
 ```
 
-### Rollback solo del backend
+Si ya existe un tag equivalente del monolito, usar ese tag como punto de
+retorno.
+
+## Rollback completo a un estado Git anterior
 
 ```bash
-# Identificar el commit anterior al primer cambio de backend en esta rama
-git log --oneline refactor/angular-backend-whatsapp
-git checkout <commit-anterior> -- backend/
-git add backend/ && git commit -m "revert: rollback backend a estado anterior"
+docker compose down
+git fetch --all --tags
+git checkout <tag-o-commit-estable>
+docker compose up --build -d
 ```
 
-### Rollback solo de Angular (mantener React)
+Si el estado anterior usaba el monolito, confirmar que su `docker-compose.yml`
+incluya `backend` y no los servicios separados.
+
+## Rollback de un microservicio
+
+Restaurar solo la carpeta afectada desde un commit estable:
 
 ```bash
-# El frontend React nunca fue eliminado — simplemente redeployar el React existente
-cd frontend && npm install && npm run build
-# El build de React queda en frontend/dist/
+git checkout <commit-estable> -- reserva-service/
+docker compose build reserva-service
+docker compose up -d reserva-service
 ```
 
-### Rollback de WhatsApp
+Repetir con el nombre real del servicio:
+
+- `api-gateway`
+- `auth-service`
+- `catalogo-service`
+- `inventario-service`
+- `reserva-service`
+- `pago-service`
+- `notificacion-service`
+- `reporte-service`
+
+## Rollback del frontend Angular
 
 ```bash
-# Volver a OpenWAService en MercadoPagoService:
-git show feature/resynced:backend/src/main/java/com/buganvilla/buganvillatours/service/MercadoPagoService.java > backend/src/main/java/com/buganvilla/buganvillatours/service/MercadoPagoService.java
+git checkout <commit-estable> -- frontend-angular/
+docker compose build frontend-angular
+docker compose up -d frontend-angular
 ```
 
-### Rollback de variables de entorno
+## Rollback de configuracion
 
-Si `application.properties` causó problemas, restaurar desde el commit original:
+Si el problema esta en variables de entorno o compose:
+
 ```bash
-git show feature/resynced:backend/src/main/resources/application.properties > backend/src/main/resources/application.properties
+git checkout <commit-estable> -- docker-compose.yml .env.example docker/
+docker compose config --quiet
+docker compose up -d
+```
+
+No versionar `.env` real. Ajustarlo manualmente si cambia el contrato de
+variables.
+
+## Verificacion post-rollback
+
+```bash
+docker compose ps
+curl http://localhost:8080/api/auth/check
+curl http://localhost/api/auth/check
+```
+
+Login:
+
+```bash
+curl -X POST http://localhost:8080/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@buganvilla.com","password":"admin123"}'
 ```
 
 ## Datos
 
-**Nunca se modificaron datos en producción** en esta rama. Todos los cambios son de código.
-No hay migraciones de esquema en esta rama — la BD sigue siendo compatible.
-
-## Verificación post-rollback
+El rollback de codigo no revierte datos. Para un entorno local se puede borrar
+el volumen con:
 
 ```bash
-cd backend && ./mvnw package -DskipTests
-curl http://localhost:8080/actuator/health
-curl -X POST http://localhost:8080/api/auth/login -H "Content-Type: application/json" -d '{"email":"...","password":"..."}'
+docker compose down -v
 ```
+
+En staging o produccion, respaldar SQL Server antes de ejecutar cambios de
+esquema o restauraciones.

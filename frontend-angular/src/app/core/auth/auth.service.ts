@@ -1,15 +1,16 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { Observable, tap } from 'rxjs';
+import { Observable, map, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { JwtService } from './jwt.service';
+import { ApiResponse, unwrapData } from '../services/api-response';
 import {
   Usuario,
   LoginRequest,
   RegisterRequest,
   AuthResponse,
-  RegisterResponse
+  ProfileUpdateRequest
 } from '../../shared/models/usuario.model';
 
 @Injectable({ providedIn: 'root' })
@@ -37,20 +38,18 @@ export class AuthService {
   }
 
   login(credentials: LoginRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials).pipe(
+    return this.http.post<ApiResponse<AuthResponse>>(`${this.apiUrl}/login`, credentials).pipe(
+      map(unwrapData),
       tap((res) => this.jwt.setSession(res.token, res.usuario)),
       tap((res) => this._user.set(res.usuario))
     );
   }
 
-  register(data: RegisterRequest): Observable<RegisterResponse> {
-    return this.http.post<RegisterResponse>(`${this.apiUrl}/register`, data).pipe(
-      tap((res) => {
-        if (res.success && res.data) {
-          this.jwt.setSession(res.data.token, res.data.usuario);
-          this._user.set(res.data.usuario);
-        }
-      })
+  register(data: RegisterRequest): Observable<AuthResponse> {
+    return this.http.post<ApiResponse<AuthResponse>>(`${this.apiUrl}/register`, data).pipe(
+      map(unwrapData),
+      tap((res) => this.jwt.setSession(res.token, res.usuario)),
+      tap((res) => this._user.set(res.usuario))
     );
   }
 
@@ -61,8 +60,20 @@ export class AuthService {
   }
 
   getProfile(): Observable<Usuario> {
-    return this.http.get<Usuario>(`${this.apiUrl}/profile`).pipe(
+    return this.http.get<ApiResponse<Usuario>>(`${this.apiUrl}/profile`).pipe(
+      map(unwrapData),
       tap((user) => {
+        this._user.set(user);
+        const token = this.jwt.getToken();
+        if (token) this.jwt.setSession(token, user);
+      })
+    );
+  }
+
+  updateProfile(data: ProfileUpdateRequest): Observable<Usuario> {
+    return this.http.put<ApiResponse<Usuario>>(`${this.apiUrl}/profile`, data).pipe(
+      map(unwrapData),
+      tap(user => {
         this._user.set(user);
         const token = this.jwt.getToken();
         if (token) this.jwt.setSession(token, user);

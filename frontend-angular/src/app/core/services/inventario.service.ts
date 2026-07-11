@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { Inventario, InventarioRequest } from '../../shared/models/inventario.model';
+import { ApiResponse, unwrapData } from './api-response';
 
 @Injectable({ providedIn: 'root' })
 export class InventarioService {
@@ -11,34 +13,34 @@ export class InventarioService {
   constructor(private http: HttpClient) {}
 
   getDisponible(): Observable<Inventario[]> {
-    return this.http.get<Inventario[]>(`${this.baseUrl}/disponible`);
+    return this.http.get<ApiResponse<Inventario[]>>(`${this.baseUrl}/disponible`).pipe(map(unwrapData));
   }
 
   getAll(): Observable<Inventario[]> {
-    return this.http.get<Inventario[]>(this.baseUrl);
+    return this.http.get<ApiResponse<Inventario[]>>(this.baseUrl).pipe(map(unwrapData));
   }
 
   getByPaquete(idPaquete: number): Observable<Inventario[]> {
-    return this.http.get<Inventario[]>(`${this.baseUrl}/paquete/${idPaquete}`);
+    return this.http.get<ApiResponse<Inventario[]>>(`${this.baseUrl}/paquete/${idPaquete}`).pipe(map(unwrapData));
   }
 
   getDisponibleByPaquete(idPaquete: number): Observable<Inventario[]> {
-    return this.http.get<Inventario[]>(`${this.baseUrl}/paquete/${idPaquete}/disponible`);
+    return this.http.get<ApiResponse<Inventario[]>>(`${this.baseUrl}/paquete/${idPaquete}/disponible`).pipe(map(unwrapData));
   }
 
   getProximasSalidas(): Observable<Inventario[]> {
-    return this.http.get<Inventario[]>(`${this.baseUrl}/proximas-salidas`);
+    return this.http.get<ApiResponse<Inventario[]>>(`${this.baseUrl}/proximas-salidas`).pipe(map(unwrapData));
   }
 
   create(inventario: InventarioRequest): Observable<Inventario> {
-    return this.http.post<Inventario>(this.baseUrl, inventario);
+    return this.http.post<ApiResponse<Inventario>>(this.baseUrl, inventario).pipe(map(unwrapData));
   }
 
   update(id: number, inventario: InventarioRequest): Observable<Inventario> {
-    return this.http.put<Inventario>(`${this.baseUrl}/${id}`, inventario);
+    return this.http.put<ApiResponse<Inventario>>(`${this.baseUrl}/${id}`, inventario).pipe(map(unwrapData));
   }
 
   delete(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${id}`);
+    return this.http.delete<ApiResponse<void>>(`${this.baseUrl}/${id}`).pipe(map(() => void 0));
   }
 }

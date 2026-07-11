@@ -55,7 +55,12 @@
             @for (r of reservasRecientes(); track r.idReserva) {
               <tr>
                 <td>{{ r.idReserva }}</td>
-                <td>{{ r.nombreCliente || r.usuario?.nombre || '—' }}</td>
+                <td>
+                  <strong>{{ r.nombreComprador || r.usuario?.nombre || '—' }}</strong>
+                  @if (r.nombreCliente && r.nombreCliente !== r.nombreComprador) {
+                    <div class="small text-muted">Viaja: {{ r.nombreCliente }}</div>
+                  }
+                </td>
                 <td>
                   <span class="badge"
                     [style.background]="r.estado === 'confirmada' ? '#d1fae5' : r.estado === 'pendiente' ? '#fef3c7' : '#fee2e2'"

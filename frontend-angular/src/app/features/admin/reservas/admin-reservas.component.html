@@ -12,7 +12,8 @@
         <thead class="table-light">
           <tr>
             <th>#</th>
-            <th>Cliente</th>
+            <th>Comprador</th>
+            <th>Viajeros / clientes</th>
             <th>Paquete</th>
             <th>Personas</th>
             <th>Fecha Reserva</th>
@@ -24,7 +25,12 @@
           @for (r of reservas(); track r.idReserva) {
             <tr>
               <td>{{ r.idReserva }}</td>
-              <td class="fw-semibold">{{ r.nombreCliente || '—' }}</td>
+              <td class="fw-semibold">{{ r.nombreComprador || '—' }}</td>
+              <td>
+                <div>{{ r.nombresViajeros || r.nombreCliente || '—' }}</div>
+                @if (r.telefonosViajeros) { <div class="text-muted small">{{ r.telefonosViajeros }}</div> }
+                @if (r.emailCliente) { <div class="text-muted small">{{ r.emailCliente }}</div> }
+              </td>
               <td>
                 <div>{{ r.nombrePaquete || '—' }}</div>
                 <div class="text-muted small">{{ r.fechaViaje || '' }}</div>
@@ -52,7 +58,7 @@
               </td>
             </tr>
           } @empty {
-            <tr><td colspan="7" class="text-center text-muted py-4">No hay reservas registradas.</td></tr>
+            <tr><td colspan="8" class="text-center text-muted py-4">No hay reservas registradas.</td></tr>
           }
         </tbody>
       </table>

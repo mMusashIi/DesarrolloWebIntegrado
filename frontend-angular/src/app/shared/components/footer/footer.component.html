@@ -1,44 +1,53 @@
-<footer class="text-white py-5 mt-auto" style="background: linear-gradient(135deg, #1f2937, #374151);">
+<footer class="footer-custom">
   <div class="container">
-    <div class="row g-4">
-      <div class="col-lg-4">
-        <h5 class="fw-bold mb-3">
-          <span style="color: #db2777;">🌸</span> Buganvilla Tours
-        </h5>
-        <p class="text-secondary">
-          Tu agencia de confianza para explorar los destinos más increíbles del Perú. Experiencias únicas, servicios de calidad.
-        </p>
+    <div class="row">
+      <div class="col-md-4 mb-4">
+        <h5><i class="fas fa-mountain me-2"></i>Buganvilla Tours</h5>
+        <p>Experiencias turísticas personalizadas, confiables y memorables en la región de Ica.</p>
+        <div class="mt-3">
+          <a href="https://www.facebook.com/Buganvillatours" target="_blank" rel="noopener noreferrer" class="me-3">
+            <i class="fab fa-facebook fa-lg"></i>
+          </a>
+          <a href="https://x.com/Buganvillatours" target="_blank" rel="noopener noreferrer" class="me-3">
+            <i class="fab fa-twitter fa-lg"></i>
+          </a>
+          <a href="https://api.whatsapp.com/send?phone=51922571344&text=Hello!%20I%20am%20interested%20in%20knowing%20more%20information%20about%20your%20programs" target="_blank" rel="noopener noreferrer">
+            <i class="fab fa-whatsapp fa-lg"></i>
+          </a>
+        </div>
       </div>
-      <div class="col-lg-2">
-        <h6 class="fw-bold mb-3">Navegación</h6>
+      <div class="col-md-2 mb-4">
+        <h5>Enlaces</h5>
         <ul class="list-unstyled">
-          <li><a routerLink="/" class="text-secondary text-decoration-none d-block mb-1">Inicio</a></li>
-          <li><a routerLink="/paquetes" class="text-secondary text-decoration-none d-block mb-1">Paquetes</a></li>
-          <li><a routerLink="/nosotros" class="text-secondary text-decoration-none d-block mb-1">Nosotros</a></li>
-          <li><a routerLink="/contacto" class="text-secondary text-decoration-none d-block mb-1">Contacto</a></li>
+          <li><a routerLink="/">Inicio</a></li>
+          <li><a routerLink="/paquetes">Paquetes</a></li>
+          <li><a routerLink="/nosotros">Nosotros</a></li>
+          <li><a routerLink="/contacto">Contacto</a></li>
         </ul>
       </div>
-      <div class="col-lg-3">
-        <h6 class="fw-bold mb-3">Destinos</h6>
-        <ul class="list-unstyled text-secondary">
-          <li class="mb-1">🏔️ Machu Picchu</li>
-          <li class="mb-1">🌈 Montaña 7 Colores</li>
-          <li class="mb-1">💧 Laguna Humantay</li>
-          <li class="mb-1">🏛️ Valle Sagrado</li>
+      <div class="col-md-3 mb-4">
+        <h5>Destinos</h5>
+        <ul class="list-unstyled">
+          <li><a routerLink="/paquetes">Líneas de Nazca</a></li>
+          <li><a routerLink="/paquetes">Islas Ballestas</a></li>
+          <li><a routerLink="/paquetes">Oasis de Huacachina</a></li>
+          <li><a routerLink="/paquetes">Bodegas de Ica</a></li>
         </ul>
       </div>
-      <div class="col-lg-3">
-        <h6 class="fw-bold mb-3">Contacto</h6>
-        <ul class="list-unstyled text-secondary">
-          <li class="mb-1">📧 info&#64;buganvillatours.com</li>
-          <li class="mb-1">📞 +51 999 888 777</li>
-          <li class="mb-1">📍 Cusco, Perú</li>
-        </ul>
+      <div class="col-md-3 mb-4">
+        <h5>Contacto</h5>
+        <p><i class="fas fa-map-marker-alt me-2"></i>Ica, Perú</p>
+        <p>
+          <i class="fas fa-phone me-2"></i>956 623 396<br>
+          <span style="margin-left: 24px;">948 401 267</span><br>
+          <span style="margin-left: 24px;">947 929 246</span>
+        </p>
+        <p><i class="fas fa-envelope me-2"></i>reservas&#64;buganvillatours.com.pe</p>
       </div>
     </div>
-    <hr class="border-secondary my-4">
-    <div class="text-center text-secondary small">
-      <p class="mb-0">© {{ currentYear }} Buganvilla Tours. Todos los derechos reservados.</p>
+    <hr style="border-color: rgba(255,255,255,0.2);">
+    <div class="text-center">
+      <p>&copy; {{ currentYear }} Buganvilla Tours. Todos los derechos reservados.</p>
     </div>
   </div>
 </footer>

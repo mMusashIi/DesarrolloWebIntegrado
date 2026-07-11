@@ -25,6 +25,7 @@ export class AdminPaquetesComponent implements OnInit {
   error = signal('');
   showForm = signal(false);
   editingId = signal<number | null>(null);
+  imagePreview = signal('');
 
   form: FormGroup = this.fb.group({
     nombrePaquete: ['', Validators.required],
@@ -32,7 +33,8 @@ export class AdminPaquetesComponent implements OnInit {
     precioBase: [0, [Validators.required, Validators.min(1)]],
     duracionDias: [1, [Validators.required, Validators.min(1)]],
     estado: ['activo', Validators.required],
-    idLugar: ['', Validators.required]
+    idLugar: ['', Validators.required],
+    imagenUrl: ['']
   });
 
   ngOnInit(): void {
@@ -51,6 +53,7 @@ export class AdminPaquetesComponent implements OnInit {
   openCreate(): void {
     this.editingId.set(null);
     this.form.reset({ estado: 'activo', precioBase: 0, duracionDias: 1 });
+    this.imagePreview.set('');
     this.showForm.set(true);
   }
 
@@ -62,14 +65,46 @@ export class AdminPaquetesComponent implements OnInit {
       precioBase: p.precioBase,
       duracionDias: p.duracionDias,
       estado: p.estado,
-      idLugar: p.lugar?.idLugar || ''
+      idLugar: p.idLugar || p.lugar?.idLugar || '',
+      imagenUrl: p.imagenUrl || ''
     });
+    this.imagePreview.set(p.imagenUrl || '');
     this.showForm.set(true);
   }
 
   closeForm(): void { this.showForm.set(false); this.error.set(''); }
 
   field(name: string) { return this.form.get(name)!; }
+
+  onImageSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      this.error.set('Selecciona un archivo de imagen válido.');
+      input.value = '';
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      this.error.set('La imagen no debe superar los 2 MB.');
+      input.value = '';
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const value = String(reader.result || '');
+      this.form.patchValue({ imagenUrl: value });
+      this.imagePreview.set(value);
+      this.error.set('');
+    };
+    reader.onerror = () => this.error.set('No se pudo leer la imagen seleccionada.');
+    reader.readAsDataURL(file);
+  }
+
+  removeImage(): void {
+    this.form.patchValue({ imagenUrl: '' });
+    this.imagePreview.set('');
+  }
 
   submit(): void {
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }

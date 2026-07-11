@@ -1,92 +1,114 @@
-# Guía de Despliegue — Buganvilla Tours
+# Guia de despliegue - Buganvilla Tours
+
+Este despliegue usa la arquitectura actual de microservicios. El monolito en
+`backend/` queda como referencia historica y no forma parte del
+`docker-compose.yml` principal.
 
 ## Prerrequisitos
 
 - Docker Desktop 4.x o Docker Engine 24+
 - Docker Compose v2
 - Git
+- Puertos libres: `4200`, `1433`, `8080` a `8087`
 
-## Despliegue con Docker Compose
+## Variables de entorno
 
-### 1. Clonar y configurar
+Para desarrollo local no es necesario crear ni modificar `.env`: Docker Compose incluye valores predeterminados
+para base de datos, JWT, comunicación interna, CORS y URLs entre servicios.
+
+Para producción o integraciones externas reales, copiar el archivo de ejemplo:
 
 ```bash
-git clone <repo-url>
-cd DesarrolloWebIntegrado
 cp .env.example .env
-# Editar .env con las credenciales reales
 ```
 
-### 2. Compilar el backend
+Ajustar como mínimo:
 
-```bash
-cd backend
-./mvnw package -DskipTests
-cd ..
+```env
+DB_PASSWORD=<password-fuerte-para-sqlserver>
+JWT_SECRET=<secreto-jwt-de-256-bits-o-mas>
+INTERNAL_SERVICE_TOKEN=<token-largo-para-comunicacion-interna>
+MP_ACCESS_TOKEN=<token-real-si-se-usa-mercadopago>
 ```
 
-### 3. Levantar todos los servicios
+No usar los valores `dev-*` en produccion.
+
+## Levantar el stack
+
+Desde la raiz del repositorio:
 
 ```bash
 docker compose up --build -d
 ```
 
-### 4. Verificar que los servicios están sanos
+Esto levanta:
+
+| Servicio | Host | Responsabilidad |
+|---|---|---|
+| `sqlserver` | `localhost:1433` | Bases de datos |
+| `api-gateway` | `localhost:8080` | Entrada HTTP `/api/**` |
+| `auth-service` | `localhost:8081` | Login, registro, usuarios |
+| `catalogo-service` | `localhost:8082` | Paquetes y lugares |
+| `inventario-service` | `localhost:8083` | Cupos y salidas |
+| `reserva-service` | `localhost:8084` | Reservas |
+| `pago-service` | `localhost:8085` | Pagos y MercadoPago |
+| `notificacion-service` | `localhost:8086` | WhatsApp y DNI/RUC |
+| `reporte-service` | `localhost:8087` | Reportes |
+| `frontend-angular` | `localhost:4200` | UI Angular con proxy a gateway |
+
+## Verificacion basica
 
 ```bash
 docker compose ps
-# Los 3 servicios deben mostrar "healthy"
-
-# Health check del backend
-curl http://localhost:8080/actuator/health
-
-# Frontend
-curl http://localhost:80
+docker compose logs --tail=100 api-gateway
+curl http://localhost:8080/api/auth/check
+curl http://localhost:4200/api/auth/check
 ```
 
-### 5. Verificar login
+Login de prueba si se cargaron los seeds del servicio de auth:
 
 ```bash
 curl -X POST http://localhost:8080/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email":"admin@buganvilla.com","password":"tu_password"}'
+  -d '{"email":"admin@buganvilla.com","password":"admin123"}'
 ```
 
-## Puertos expuestos
+## Logs utiles
 
-| Servicio | Puerto interno | Puerto host |
-|----------|---------------|-------------|
-| SQL Server | 1433 | 1433 |
-| Backend (Spring Boot) | 8080 | 8080 |
-| Frontend (nginx) | 80 | 80 |
+```bash
+docker compose logs -f api-gateway
+docker compose logs -f auth-service
+docker compose logs -f reserva-service
+docker compose logs -f pago-service
+docker compose logs -f frontend-angular
+docker compose logs -f sqlserver
+```
 
-## Variables de entorno críticas
-
-Ver `.env.example` para la lista completa. Las mínimas para arrancar:
-- `DB_PASSWORD` — contraseña de SQL Server
-- `JWT_SECRET` — mínimo 256 bits aleatorios
-- `DB_URL` — se sobreescribe automáticamente en Docker para apuntar al servicio `sqlserver`
-
-## Actualizar en producción
+## Actualizar despliegue
 
 ```bash
 git pull
-cd backend && ./mvnw package -DskipTests && cd ..
-docker compose up --build -d backend frontend
+docker compose build
+docker compose up -d
 ```
 
-## Ver logs
+Para reconstruir solo un servicio:
 
 ```bash
-docker compose logs -f backend
-docker compose logs -f frontend
-docker compose logs -f sqlserver
+docker compose build reserva-service
+docker compose up -d reserva-service
 ```
 
 ## Detener
 
 ```bash
 docker compose down
-# Para eliminar también el volumen de datos (¡destruye la BD!):
+```
+
+Eliminar tambien datos de SQL Server:
+
+```bash
 docker compose down -v
 ```
+
+Ese ultimo comando destruye las bases locales del volumen Docker.

@@ -1,7 +1,8 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-white" style="box-shadow: 0 4px 6px rgba(0,0,0,0.1); padding: 15px 0;">
+<nav class="navbar navbar-expand-lg navbar-light fixed-top navbar-custom">
   <div class="container">
-    <a class="navbar-brand fw-bold fs-4" routerLink="/" style="color: var(--primary-color);">
-      🌸 Buganvilla Tours
+    <a class="navbar-brand navbar-brand-custom" routerLink="/">
+      <i class="fas fa-mountain text-primary-custom me-2"></i>
+      Buganvilla Tours
     </a>
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -9,57 +10,65 @@
     </button>
 
     <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav me-auto">
+      <ul class="navbar-nav ms-auto align-items-center">
         <li class="nav-item">
-          <a class="nav-link fw-500" style="color: #1f2937;" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Inicio</a>
+          <a class="nav-link nav-link-custom" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Inicio</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link fw-500" style="color: #1f2937;" routerLink="/paquetes" routerLinkActive="active">Paquetes</a>
+          <a class="nav-link nav-link-custom" routerLink="/paquetes" routerLinkActive="active">Paquetes</a>
         </li>
-        @if (auth.isAuthenticated()) {
+        <li class="nav-item">
+          <a class="nav-link nav-link-custom" routerLink="/nosotros" routerLinkActive="active">Nosotros</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link nav-link-custom" routerLink="/contacto" routerLinkActive="active">Contacto</a>
+        </li>
+        @if (auth.isAdmin()) {
           <li class="nav-item">
-            <a class="nav-link fw-500" style="color: #1f2937;" routerLink="/reservas" routerLinkActive="active">Reservar</a>
+            <a class="nav-link nav-link-custom fw-bold text-danger" routerLink="/admin" routerLinkActive="active">
+              <i class="fas fa-user-cog me-1"></i>Admin
+            </a>
           </li>
         }
-        <li class="nav-item">
-          <a class="nav-link fw-500" style="color: #1f2937;" routerLink="/nosotros" routerLinkActive="active">Nosotros</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link fw-500" style="color: #1f2937;" routerLink="/contacto" routerLinkActive="active">Contacto</a>
-        </li>
       </ul>
 
-      <div class="d-flex align-items-center gap-2">
+      <div class="d-flex align-items-center gap-2 ms-lg-3">
         @if (auth.isAuthenticated()) {
-          @if (auth.isAdmin()) {
-            <a routerLink="/admin" class="btn btn-sm btn-warning fw-bold">
-              Panel Admin
-            </a>
-          }
           <div class="dropdown">
-            <button class="btn btn-sm fw-bold dropdown-toggle"
-              style="background: white; color: var(--primary-color); border: 2px solid var(--primary-color); border-radius: 50px; padding: 8px 20px;"
+            <button class="btn btn-outline-primary-custom dropdown-toggle"
               type="button" data-bs-toggle="dropdown">
-              {{ auth.currentUser()?.nombre }} {{ auth.currentUser()?.apellido }}
+              <i class="fas fa-user-check me-2"></i>
+              Hola, {{ auth.currentUser()?.nombre?.split(' ')?.[0] || 'Usuario' }}
             </button>
-            <ul class="dropdown-menu dropdown-menu-end">
-              <li><span class="dropdown-item-text text-muted small">{{ auth.currentUser()?.email }}</span></li>
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+              <li><span class="dropdown-item-text text-muted small">
+                <i class="fas fa-envelope me-2"></i>{{ auth.currentUser()?.email }}
+              </span></li>
+              <li><hr class="dropdown-divider"></li>
+              <li>
+                <button class="dropdown-item" (click)="showProfileModal.set(true)">
+                  <i class="fas fa-user-edit me-2 text-primary-custom"></i>Editar perfil y celular
+                </button>
+              </li>
+              <li>
+                <a class="dropdown-item" routerLink="/reservas">
+                  <i class="fas fa-suitcase me-2 text-primary-custom"></i>Mis compras
+                </a>
+              </li>
               <li><hr class="dropdown-divider"></li>
               <li>
                 <button class="dropdown-item text-danger" (click)="auth.logout()">
-                  Cerrar sesión
+                  <i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión
                 </button>
               </li>
             </ul>
           </div>
         } @else {
-          <button class="btn btn-sm fw-bold" (click)="openLogin()"
-            style="background: white; color: var(--primary-color); border: 2px solid var(--primary-color); border-radius: 50px; padding: 8px 20px;">
-            Iniciar sesión
+          <button class="btn btn-outline-primary-custom" (click)="openLogin()">
+            <i class="fas fa-sign-in-alt me-2"></i>Iniciar Sesión
           </button>
-          <button class="btn btn-sm fw-bold" (click)="openRegister()"
-            style="background-color: var(--primary-color); color: white; border-radius: 50px; padding: 8px 20px; border: none;">
-            Registrarse
+          <button class="btn btn-primary-custom" (click)="openRegister()">
+            <i class="fas fa-user-plus me-2"></i>Registrarse
           </button>
         }
       </div>
@@ -73,4 +82,8 @@
 
 @if (showRegisterModal()) {
   <app-register-modal (close)="closeRegister()" (success)="onRegisterSuccess()"></app-register-modal>
+}
+
+@if (showProfileModal()) {
+  <app-profile-modal (close)="showProfileModal.set(false)"></app-profile-modal>
 }

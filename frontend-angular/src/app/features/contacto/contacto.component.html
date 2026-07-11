@@ -1,105 +1,274 @@
-<!-- Header -->
-<section class="py-4 text-white" style="background: linear-gradient(135deg, #4c1d95, #6d28d9);">
+<!-- Page Header -->
+<section class="py-5"
+  style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white;">
   <div class="container">
-    <h1 class="fw-bold mb-1">📬 Contáctanos</h1>
-    <p class="opacity-75 mb-0">Estamos aquí para ayudarte a planificar tu viaje perfecto</p>
+    <div class="text-center">
+      <h1 class="display-4 mb-3">Contáctanos</h1>
+      <p class="lead">Estamos aquí para responder todas tus preguntas y ayudarte a planificar tu aventura</p>
+    </div>
   </div>
 </section>
 
-<section class="py-5" style="background-color: #f3f4f6;">
+<!-- Contact Information Cards -->
+<section class="section-padding">
   <div class="container">
-    <div class="row g-5">
-      <!-- Contact Info -->
-      <div class="col-lg-4">
-        <h4 class="fw-bold mb-4" style="color: #4c1d95;">Información de contacto</h4>
-        <div class="d-flex align-items-start mb-4">
-          <span class="fs-4 me-3">📍</span>
-          <div>
-            <div class="fw-semibold">Dirección</div>
-            <div class="text-muted">Av. El Sol 123, Cusco, Perú</div>
-          </div>
-        </div>
-        <div class="d-flex align-items-start mb-4">
-          <span class="fs-4 me-3">📞</span>
-          <div>
-            <div class="fw-semibold">Teléfono</div>
-            <div class="text-muted">+51 084 123456</div>
-          </div>
-        </div>
-        <div class="d-flex align-items-start mb-4">
-          <span class="fs-4 me-3">📧</span>
-          <div>
-            <div class="fw-semibold">Email</div>
-            <div class="text-muted">info&#64;buganvillatours.com</div>
-          </div>
-        </div>
-        <div class="d-flex align-items-start mb-4">
-          <span class="fs-4 me-3">🕐</span>
-          <div>
-            <div class="fw-semibold">Horario de atención</div>
-            <div class="text-muted">Lun–Sáb: 8:00am – 6:00pm</div>
+    <div class="row">
+      <div class="col-lg-4 mb-4">
+        <div class="card card-custom text-center h-100">
+          <div class="card-body">
+            <div class="mb-4">
+              <i class="fas fa-map-marker-alt fa-3x text-primary-custom"></i>
+            </div>
+            <h5 class="card-title">Ubicación</h5>
+            <p class="card-text">Ica, Perú</p>
+            <small class="text-muted">Ofrecemos servicios en toda la región de Ica</small>
           </div>
         </div>
       </div>
 
+      <div class="col-lg-4 mb-4">
+        <div class="card card-custom text-center h-100">
+          <div class="card-body">
+            <div class="mb-4">
+              <i class="fas fa-phone fa-3x text-primary-custom"></i>
+            </div>
+            <h5 class="card-title">Teléfonos</h5>
+            <p class="card-text">
+              <strong>956 623 396</strong><br>
+              <strong>948 401 267</strong><br>
+              <strong>947 929 246</strong>
+            </p>
+            <small class="text-muted">Disponibles de 8:00 AM a 6:30 PM</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4 mb-4">
+        <div class="card card-custom text-center h-100">
+          <div class="card-body">
+            <div class="mb-4">
+              <i class="fas fa-envelope fa-3x text-primary-custom"></i>
+            </div>
+            <h5 class="card-title">Email &amp; WhatsApp</h5>
+            <p class="card-text">
+              <strong>reservas&#64;buganvillatours.com.pe</strong>
+            </p>
+            <a href="https://api.whatsapp.com/send?phone=51922571344&text=Hello!%20I%20am%20interested%20in%20knowing%20more%20information%20about%20your%20programs"
+              target="_blank" rel="noopener noreferrer"
+              class="btn btn-success btn-sm mt-2">
+              <i class="fab fa-whatsapp me-2"></i>Chat por WhatsApp
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Contact Form & Sidebar -->
+<section class="section-padding" style="background-color: var(--background-light);">
+  <div class="container">
+    <div class="row">
       <!-- Contact Form -->
-      <div class="col-lg-8">
-        @if (enviado()) {
-          <div class="card p-5 text-center">
-            <div class="display-1 mb-3">✅</div>
-            <h4 class="fw-bold text-success">¡Mensaje enviado!</h4>
-            <p class="text-muted">Nos pondremos en contacto contigo pronto.</p>
-            <button class="btn btn-outline-secondary mt-3" (click)="enviado.set(false); form.reset()">
-              Enviar otro mensaje
-            </button>
-          </div>
-        } @else {
-          <div class="card p-4">
-            <h5 class="fw-bold mb-4">Envíanos un mensaje</h5>
-            <form [formGroup]="form" (ngSubmit)="submit()">
-              <div class="row g-3 mb-3">
-                <div class="col-md-6">
-                  <label class="form-label fw-semibold">Nombre *</label>
-                  <input type="text" formControlName="nombre" class="form-control"
-                    [class.is-invalid]="field('nombre').invalid && field('nombre').touched">
-                  @if (field('nombre').invalid && field('nombre').touched) {
-                    <div class="invalid-feedback">Nombre requerido.</div>
-                  }
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label fw-semibold">Email *</label>
-                  <input type="email" formControlName="email" class="form-control"
-                    [class.is-invalid]="field('email').invalid && field('email').touched">
-                  @if (field('email').invalid && field('email').touched) {
-                    <div class="invalid-feedback">Email inválido.</div>
-                  }
-                </div>
+      <div class="col-lg-8 mb-4">
+        <div class="reservation-form">
+          <h3 class="mb-4">Envíanos un Mensaje</h3>
+
+          @if (enviado()) {
+            <div class="alert-success-custom mb-4">
+              <i class="fas fa-check-circle me-2"></i>
+              ¡Mensaje enviado exitosamente! Te contactaremos dentro de las próximas 24 horas.
+            </div>
+          }
+
+          <form [formGroup]="form" (ngSubmit)="submit()">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label fw-bold">Nombre Completo *</label>
+                <input type="text" formControlName="nombre" class="form-control form-control-custom"
+                  [class.is-invalid]="field('nombre').invalid && field('nombre').touched">
+                @if (field('nombre').invalid && field('nombre').touched) {
+                  <div class="invalid-feedback">Nombre requerido.</div>
+                }
               </div>
-              <div class="mb-3">
-                <label class="form-label fw-semibold">Asunto *</label>
-                <input type="text" formControlName="asunto" class="form-control"
+              <div class="col-md-6 mb-3">
+                <label class="form-label fw-bold">Email *</label>
+                <input type="email" formControlName="email" class="form-control form-control-custom"
+                  [class.is-invalid]="field('email').invalid && field('email').touched">
+                @if (field('email').invalid && field('email').touched) {
+                  <div class="invalid-feedback">Email inválido.</div>
+                }
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label fw-bold">Teléfono</label>
+                <input type="tel" class="form-control form-control-custom" placeholder="Opcional">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label fw-bold">Asunto *</label>
+                <select formControlName="asunto" class="form-select form-control-custom"
                   [class.is-invalid]="field('asunto').invalid && field('asunto').touched">
+                  <option value="">Selecciona un asunto...</option>
+                  <option value="consulta">Consulta General</option>
+                  <option value="reserva">Reserva de Tour</option>
+                  <option value="grupo">Viaje Grupal</option>
+                  <option value="personalizado">Tour Personalizado</option>
+                  <option value="queja">Sugerencia o Queja</option>
+                  <option value="otro">Otro</option>
+                </select>
                 @if (field('asunto').invalid && field('asunto').touched) {
-                  <div class="invalid-feedback">Asunto requerido.</div>
+                  <div class="invalid-feedback">Selecciona un asunto.</div>
                 }
               </div>
-              <div class="mb-4">
-                <label class="form-label fw-semibold">Mensaje * <span class="text-muted small">(mínimo 20 caracteres)</span></label>
-                <textarea formControlName="mensaje" class="form-control" rows="5"
-                  [class.is-invalid]="field('mensaje').invalid && field('mensaje').touched"
-                  placeholder="Cuéntanos cómo podemos ayudarte..."></textarea>
-                @if (field('mensaje').invalid && field('mensaje').touched) {
-                  <div class="invalid-feedback">El mensaje debe tener al menos 20 caracteres.</div>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label fw-bold">Mensaje * <span class="text-muted small">(mínimo 20 caracteres)</span></label>
+              <textarea formControlName="mensaje" class="form-control form-control-custom" rows="6"
+                [class.is-invalid]="field('mensaje').invalid && field('mensaje').touched"
+                placeholder="Describe tu consulta, interés en algún tour, fechas preferidas, número de personas, etc."></textarea>
+              @if (field('mensaje').invalid && field('mensaje').touched) {
+                <div class="invalid-feedback">El mensaje debe tener al menos 20 caracteres.</div>
+              }
+            </div>
+
+            <div class="text-center">
+              <button type="submit" class="btn btn-primary-custom btn-lg px-5" [disabled]="enviando()">
+                @if (enviando()) {
+                  <span class="loading-spinner me-2"></span>
+                  Enviando...
+                } @else {
+                  <i class="fas fa-paper-plane me-2"></i>
+                  Enviar Mensaje
                 }
-              </div>
-              <button type="submit" class="btn btn-lg w-100 fw-bold text-white" [disabled]="enviando()"
-                style="background: linear-gradient(135deg, #4c1d95, #6d28d9);">
-                @if (enviando()) { <span class="spinner-border spinner-border-sm me-2"></span> }
-                Enviar mensaje
               </button>
-            </form>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="col-lg-4">
+        <div class="sticky-top" style="top: 100px;">
+          <!-- Horario -->
+          <div class="card card-custom mb-4">
+            <div class="card-body">
+              <h5 class="card-title">
+                <i class="fas fa-clock text-primary-custom me-2"></i>
+                Horario de Atención
+              </h5>
+              <ul class="list-unstyled">
+                <li class="mb-2">
+                  <strong>Lunes - Viernes:</strong><br>
+                  8:00 AM - 6:30 PM
+                </li>
+                <li class="mb-2">
+                  <strong>Sábados:</strong><br>
+                  8:00 AM - 4:00 PM
+                </li>
+              </ul>
+            </div>
           </div>
-        }
+
+          <!-- Social Media -->
+          <div class="card card-custom mb-4">
+            <div class="card-body">
+              <h5 class="card-title">
+                <i class="fas fa-share-alt text-primary-custom me-2"></i>
+                Síguenos en Redes
+              </h5>
+              <div class="d-flex justify-content-center gap-3">
+                <a href="https://www.facebook.com/Buganvillatours" target="_blank" rel="noopener noreferrer"
+                  class="btn btn-outline-primary btn-sm">
+                  <i class="fab fa-facebook-f"></i>
+                </a>
+                <a href="https://x.com/Buganvillatours" target="_blank" rel="noopener noreferrer"
+                  class="btn btn-outline-primary btn-sm">
+                  <i class="fab fa-twitter"></i>
+                </a>
+                <a href="https://api.whatsapp.com/send?phone=51922571344" target="_blank" rel="noopener noreferrer"
+                  class="btn btn-outline-success btn-sm">
+                  <i class="fab fa-whatsapp"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Urgent Contact -->
+          <div class="card card-custom border-warning">
+            <div class="card-body">
+              <h5 class="card-title text-warning">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                Contacto Urgente
+              </h5>
+              <p class="small mb-2">Para emergencias durante un tour activo:</p>
+              <p class="mb-2"><strong>+51 956 623 396</strong></p>
+              <small class="text-muted">Disponible 24/7 para clientes en tour</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="section-padding">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="section-title">Preguntas Frecuentes</h2>
+      <p class="section-subtitle">Respuestas rápidas a tus dudas más comunes</p>
+    </div>
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+        <div class="accordion" id="faqAccordion">
+          <div class="accordion-item">
+            <h3 class="accordion-header">
+              <button class="accordion-button" type="button"
+                data-bs-toggle="collapse" data-bs-target="#faq1">
+                ¿Con cuánta anticipación debo reservar?
+              </button>
+            </h3>
+            <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+              <div class="accordion-body">
+                Recomendamos reservar con al menos 48 horas de anticipación. Para grupos grandes o
+                tours personalizados, sugerimos contactarnos con 1 semana de anticipación.
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h3 class="accordion-header">
+              <button class="accordion-button collapsed" type="button"
+                data-bs-toggle="collapse" data-bs-target="#faq2">
+                ¿Qué métodos de pago aceptan?
+              </button>
+            </h3>
+            <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+              <div class="accordion-body">
+                Aceptamos efectivo, transferencias bancarias, Yape, Plin y tarjetas de crédito/débito
+                (con un pequeño recargo adicional).
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h3 class="accordion-header">
+              <button class="accordion-button collapsed" type="button"
+                data-bs-toggle="collapse" data-bs-target="#faq3">
+                ¿Ofrecen recogida en hotel?
+              </button>
+            </h3>
+            <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+              <div class="accordion-body">
+                Sí, ofrecemos servicio de recogida en la mayoría de hoteles de Ica sin costo
+                adicional. Indícanos tu hotel al hacer la reserva.
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>

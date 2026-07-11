@@ -1,18 +1,14 @@
 <!-- HERO SECTION — video de fondo igual que React -->
-<section id="home" class="position-relative overflow-hidden" style="min-height: 100vh; display: flex; align-items: center; background: linear-gradient(135deg, #280246 0%, #4a0080 50%, #280246 100%);">
-
-  <!-- Video de fondo -->
-  <div class="position-absolute top-0 start-0 w-100 h-100" style="z-index: 0; overflow: hidden;">
-    <video autoplay loop muted playsinline
-      style="min-width:100%; min-height:100%; width:auto; height:auto; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); object-fit:cover;">
+<section class="hero-section">
+  <div class="video-background">
+    <video #heroVideo autoplay loop muted playsinline preload="auto" class="video-element"
+      poster="/images/illustration.png" aria-label="Paisajes turísticos de Ica">
       <source src="/videos/ica-loop.mp4" type="video/mp4">
     </video>
-    <!-- Overlay morado -->
-    <div class="position-absolute top-0 start-0 w-100 h-100" style="background: rgba(40,2,70,0.65); z-index: 1;"></div>
+    <div class="video-overlay"></div>
   </div>
 
-  <!-- Contenido -->
-  <div class="container position-relative text-white" style="z-index: 2; padding-top: 80px; padding-bottom: 80px;">
+  <div class="container position-relative text-white" style="z-index: 2;">
     <div class="row w-100">
       <div class="col-lg-10 col-xl-8">
         <h1 class="display-4 fw-bold mb-4">Descubre la Magia de Ica</h1>
@@ -21,10 +17,10 @@
           Paracas y Nazca. Combina cultura, naturaleza y aventura con nosotros.
         </p>
         <div class="d-flex flex-wrap gap-3">
-          <a routerLink="/paquetes" class="btn btn-light btn-lg fw-bold" style="color: var(--primary-color);">
+          <a routerLink="/paquetes" class="btn btn-light btn-lg fw-bold" style="color: var(--primary-color); border-radius: 25px;">
             <i class="fas fa-map-marked-alt me-2"></i>Ver Paquetes
           </a>
-          <a routerLink="/reservas" class="btn btn-outline-light btn-lg fw-bold">
+          <a routerLink="/reservas" class="btn btn-outline-light btn-lg fw-bold" style="border-radius: 25px;">
             <i class="fas fa-calendar-plus me-2"></i>Reservar Ahora
           </a>
         </div>
@@ -34,16 +30,13 @@
 </section>
 
 <!-- STATS SECTION -->
-<section class="py-5 bg-white">
+<section class="stats-section">
   <div class="container">
-    <div class="row g-4 text-center">
+    <div class="row text-center">
       @for (stat of stats; track stat.label) {
-        <div class="col-6 col-md-3">
-          <div class="p-3">
-            <div class="display-5 mb-1">{{ stat.icon }}</div>
-            <div class="display-6 fw-bold" style="color: var(--primary-color);">{{ stat.value }}</div>
-            <div class="text-muted">{{ stat.label }}</div>
-          </div>
+        <div class="col-md-3 col-6 mb-4">
+          <div class="stat-number">{{ stat.value }}</div>
+          <p class="mb-0">{{ stat.label }}</p>
         </div>
       }
     </div>
@@ -51,7 +44,7 @@
 </section>
 
 <!-- FEATURED PACKAGES -->
-<section class="py-5" style="background-color: #f9fafb;">
+<section class="section-padding" style="background-color: var(--background-light);">
   <div class="container">
     <div class="text-center mb-5">
       <h2 class="section-title">Nuestros Paquetes Destacados</h2>
@@ -74,10 +67,10 @@
               <div class="card-body d-flex flex-column">
                 <div class="d-flex justify-content-between align-items-start mb-2">
                   <span class="badge" style="background: #f3e8ff; color: var(--primary-color);">
-                    {{ paquete.lugar?.ciudad || 'Ica' }}
+                    <i class="fas fa-map-marker-alt me-1"></i>{{ paquete.lugar?.ciudad || 'Ica' }}
                   </span>
                   <span class="badge" style="background: #f0fdf4; color: #15803d;">
-                    {{ paquete.duracionDias }} día(s)
+                    <i class="far fa-clock me-1"></i>{{ paquete.duracionDias }} día(s)
                   </span>
                 </div>
                 <h5 class="card-title fw-bold mt-2">{{ paquete.nombrePaquete }}</h5>
@@ -85,14 +78,12 @@
                   {{ paquete.descripcion | slice:0:100 }}{{ (paquete.descripcion?.length ?? 0) > 100 ? '...' : '' }}
                 </p>
                 <div class="d-flex justify-content-between align-items-center mt-3">
-                  <span class="fs-5 fw-bold" style="color: var(--primary-color);">
-                    S/ {{ paquete.precioBase | number:'1.2-2' }}
-                  </span>
+                  <span class="price-tag">S/ {{ paquete.precioBase | number:'1.2-2' }}</span>
                   <span class="text-muted small">
-                    {{ getCuposPaquete(paquete.idPaquete) }} cupos
+                    <i class="fas fa-users me-1"></i>{{ getCuposPaquete(paquete.idPaquete) }} cupos
                   </span>
                 </div>
-                <a routerLink="/paquetes" class="btn btn-primary-custom mt-3 text-white">
+                <a routerLink="/paquetes" class="btn btn-primary-custom mt-3 text-white text-center">
                   Ver detalles
                 </a>
               </div>
@@ -101,8 +92,8 @@
         }
       </div>
       <div class="text-center mt-4">
-        <a routerLink="/paquetes" class="btn btn-lg btn-outline-secondary">
-          Ver todos los paquetes →
+        <a routerLink="/paquetes" class="btn btn-secondary-custom btn-lg">
+          Ver todos los paquetes <i class="fas fa-arrow-right ms-2"></i>
         </a>
       </div>
     }
@@ -110,26 +101,30 @@
 </section>
 
 <!-- TESTIMONIALS -->
-<section class="py-5 bg-white">
+<section class="section-padding bg-white">
   <div class="container">
     <div class="text-center mb-5">
       <h2 class="section-title">Lo que dicen nuestros viajeros</h2>
-      <p class="section-subtitle">Más de 2,000 viajeros satisfechos avalan nuestra calidad</p>
+      <p class="section-subtitle">Más de 1,500 viajeros satisfechos avalan nuestra calidad</p>
     </div>
     <div class="row g-4">
       @for (t of testimonios; track t.nombre) {
         <div class="col-md-4">
-          <div class="card card-custom h-100 p-4">
-            <div class="text-warning mb-2">
-              @for (s of [1,2,3,4,5]; track s) { <span>⭐</span> }
+          <div class="testimonial-card card-custom p-4">
+            <div class="text-warning mb-3">
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
             </div>
-            <p class="text-muted fst-italic mb-3">"{{ t.texto }}"</p>
-            <div class="d-flex align-items-center">
+            <p class="text-muted fst-italic mb-4">"{{ t.texto }}"</p>
+            <div class="d-flex align-items-center justify-content-center">
               <div class="rounded-circle text-white fw-bold d-flex align-items-center justify-content-center me-3"
-                style="width:40px; height:40px; background: var(--primary-color); min-width:40px;">
+                style="width:48px; height:48px; background: var(--primary-color); min-width:48px; font-size: 1.2rem;">
                 {{ t.nombre[0] }}
               </div>
-              <div>
+              <div class="text-start">
                 <div class="fw-semibold">{{ t.nombre }}</div>
                 <div class="text-muted small">{{ t.origen }}</div>
               </div>
@@ -150,7 +145,7 @@
         <p class="mb-0 text-white-50">Contáctanos y planifiquemos juntos tu experiencia perfecta.</p>
       </div>
       <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
-        <a routerLink="/contacto" class="btn btn-light btn-lg fw-bold" style="color: var(--primary-color);">
+        <a routerLink="/contacto" class="btn btn-light btn-lg fw-bold" style="color: var(--primary-color); border-radius: 25px;">
           <i class="fas fa-envelope me-2"></i>Contáctanos
         </a>
       </div>
@@ -159,12 +154,12 @@
 </section>
 
 <!-- MAP SECTION -->
-<section class="py-5 bg-white">
+<section class="section-padding bg-white">
   <div class="container">
     <div class="row justify-content-center">
       <div class="col-lg-10 text-center mb-5">
         <h2 class="section-title mb-3">Conoce la magia de Ica con Nosotros</h2>
-        <p class="section-subtitle fw-light fs-5 text-muted">
+        <p class="section-subtitle fw-light fs-5">
           Visita nuestra sede principal para planificar tu itinerario perfecto. Somos el punto donde
           la cultura, la naturaleza y la aventura se unen para crear tu experiencia inolvidable.
         </p>
