@@ -1,0 +1,81 @@
+.pago-resultado-page {
+  min-height: 85vh;
+  display: flex;
+  align-items: center;
+  background: linear-gradient(135deg, #f9fafb 0%, #f3f0ff 100%);
+}
+
+.result-card {
+  border: none !important;
+  border-radius: 24px !important;
+  box-shadow: 0 20px 60px rgba(76, 29, 149, 0.12) !important;
+  animation: slideUp 0.5s ease-out;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Icon */
+.icon-wrapper {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.05); }
+}
+
+.result-icon {
+  font-size: 3rem;
+}
+
+/* Status badges */
+.status-badge {
+  display: inline-block;
+  padding: 6px 18px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.badge-success {
+  background: rgba(5, 150, 105, 0.1);
+  color: #059669;
+}
+
+.badge-danger {
+  background: rgba(220, 38, 38, 0.1);
+  color: #dc2626;
+}
+
+.badge-warning {
+  background: rgba(217, 119, 6, 0.1);
+  color: #d97706;
+}
+
+/* Detail box */
+.detail-box {
+  background: var(--background-light);
+  border: 1px solid rgba(76, 29, 149, 0.08);
+  border-radius: 12px;
+  padding: 16px 20px;
+  text-align: left;
+}
+
+/* WhatsApp note */
+.whatsapp-note {
+  background: rgba(37, 211, 102, 0.08);
+  border: 1px solid rgba(37, 211, 102, 0.2);
+  border-radius: 10px;
+  padding: 10px 16px;
+}

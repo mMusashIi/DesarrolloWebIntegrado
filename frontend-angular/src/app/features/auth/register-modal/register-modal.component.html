@@ -1,0 +1,92 @@
+<div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title fw-bold">
+          <i class="fas fa-user-plus text-primary-custom me-2"></i>
+          Crear Cuenta
+        </h5>
+        <button type="button" class="btn-close" (click)="close.emit()" [disabled]="loading()"></button>
+      </div>
+      <div class="modal-body p-4">
+        @if (error()) {
+          <div class="alert-error-custom mb-3">
+            <i class="fas fa-exclamation-triangle me-2"></i>{{ error() }}
+          </div>
+        }
+        <form [formGroup]="form" (ngSubmit)="submit()">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Nombre *</label>
+              <input type="text" formControlName="nombre" class="form-control form-control-custom"
+                [class.is-invalid]="field('nombre').invalid && field('nombre').touched">
+              @if (field('nombre').invalid && field('nombre').touched) {
+                <div class="invalid-feedback">Nombre requerido (mín. 2 caracteres).</div>
+              }
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Apellido *</label>
+              <input type="text" formControlName="apellido" class="form-control form-control-custom"
+                [class.is-invalid]="field('apellido').invalid && field('apellido').touched">
+              @if (field('apellido').invalid && field('apellido').touched) {
+                <div class="invalid-feedback">Apellido requerido (mín. 2 caracteres).</div>
+              }
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Correo Electrónico *</label>
+              <input type="email" formControlName="email" class="form-control form-control-custom"
+                [class.is-invalid]="field('email').invalid && field('email').touched">
+              @if (field('email').invalid && field('email').touched) {
+                <div class="invalid-feedback">Email inválido.</div>
+              }
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Contraseña *</label>
+              <input type="password" formControlName="password" class="form-control form-control-custom"
+                [class.is-invalid]="field('password').invalid && field('password').touched">
+              @if (field('password').invalid && field('password').touched) {
+                <div class="invalid-feedback">Mínimo 8 caracteres.</div>
+              }
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Teléfono *</label>
+              <div class="input-group">
+                <select formControlName="prefijoTelefono" class="form-select" style="max-width: 155px;">
+                  @for (country of countries; track country.code) {
+                    <option [value]="country.dialCode">{{ country.code }} {{ country.dialCode }}</option>
+                  }
+                </select>
+                <input type="tel" inputmode="numeric" formControlName="telefono" class="form-control form-control-custom"
+                  placeholder="987654321" [class.is-invalid]="field('telefono').invalid && field('telefono').touched">
+              </div>
+              @if (field('telefono').invalid && field('telefono').touched) {
+                <div class="text-danger small mt-1">Ingresa entre 6 y 12 dígitos, sin repetir el código de país.</div>
+              }
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Nacionalidad</label>
+              <select formControlName="nacionalidad" class="form-select form-control-custom">
+                @for (country of countries; track country.code) {
+                  <option [value]="country.name">{{ country.name }}</option>
+                }
+              </select>
+            </div>
+          </div>
+
+          <div class="d-grid gap-2 mt-4">
+            <button type="submit" class="btn btn-primary-custom" [disabled]="loading()">
+              @if (loading()) { <span class="loading-spinner me-2"></span> }
+              <i class="fas fa-user-plus me-2"></i>Crear Cuenta
+            </button>
+          </div>
+        </form>
+
+        <div class="text-center mt-3">
+          <button class="btn btn-link p-0 text-primary-custom" (click)="close.emit()" [disabled]="loading()">
+            ¿Ya tienes cuenta? Inicia sesión aquí
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

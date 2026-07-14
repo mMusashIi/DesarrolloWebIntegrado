@@ -1,0 +1,148 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4 class="fw-bold mb-0">🏔️ Gestión de Paquetes</h4>
+  <button class="btn fw-bold text-white" style="background: #4c1d95;" (click)="openCreate()">
+    + Nuevo Paquete
+  </button>
+</div>
+
+@if (loading()) {
+  <app-loading-spinner></app-loading-spinner>
+} @else {
+  <div class="card">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>#</th>
+            <th>Nombre</th>
+            <th>Lugar</th>
+            <th>Precio</th>
+            <th>Días</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (p of paquetes(); track p.idPaquete) {
+            <tr>
+              <td>{{ p.idPaquete }}</td>
+              <td class="fw-semibold">{{ p.nombrePaquete }}</td>
+              <td>{{ p.lugar?.ciudad || '—' }}</td>
+              <td>S/ {{ p.precioBase | number:'1.2-2' }}</td>
+              <td>{{ p.duracionDias }}</td>
+              <td>
+                <span class="badge" [style.background]="p.estado === 'activo' ? '#d1fae5' : '#fee2e2'"
+                  [style.color]="p.estado === 'activo' ? '#065f46' : '#991b1b'">
+                  {{ p.estado }}
+                </span>
+              </td>
+              <td>
+                <button class="btn btn-sm btn-outline-primary me-1" (click)="openEdit(p)">✏️</button>
+                <button class="btn btn-sm btn-outline-danger" (click)="delete(p.idPaquete)">🗑️</button>
+              </td>
+            </tr>
+          } @empty {
+            <tr><td colspan="7" class="text-center text-muted py-4">No hay paquetes registrados.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+}
+
+<!-- Form Modal -->
+@if (showForm()) {
+  <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header" style="background: linear-gradient(135deg, #4c1d95, #6d28d9); color: white;">
+          <h5 class="modal-title fw-bold">{{ editingId() ? 'Editar Paquete' : 'Nuevo Paquete' }}</h5>
+          <button type="button" class="btn-close btn-close-white" (click)="closeForm()"></button>
+        </div>
+        <div class="modal-body p-4">
+          @if (error()) {
+            <div class="alert alert-danger">{{ error() }}</div>
+          }
+          <form [formGroup]="form" (ngSubmit)="submit()">
+            <div class="row g-3 mb-3">
+              <div class="col-md-8">
+                <label class="form-label fw-semibold">Nombre *</label>
+                <input type="text" formControlName="nombrePaquete" class="form-control"
+                  [class.is-invalid]="field('nombrePaquete').invalid && field('nombrePaquete').touched">
+                @if (field('nombrePaquete').invalid && field('nombrePaquete').touched) {
+                  <div class="invalid-feedback">Nombre requerido.</div>
+                }
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-semibold">Estado *</label>
+                <select formControlName="estado" class="form-select">
+                  <option value="activo">Activo</option>
+                  <option value="inactivo">Inactivo</option>
+                </select>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Descripción *</label>
+              <textarea formControlName="descripcion" class="form-control" rows="3"
+                [class.is-invalid]="field('descripcion').invalid && field('descripcion').touched"></textarea>
+              @if (field('descripcion').invalid && field('descripcion').touched) {
+                <div class="invalid-feedback">Descripción requerida.</div>
+              }
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Imagen del paquete</label>
+              <input type="file" class="form-control" accept="image/*" (change)="onImageSelected($event)">
+              <div class="form-text">JPG, PNG o WebP, máximo 2 MB.</div>
+              @if (imagePreview()) {
+                <div class="mt-2 d-flex align-items-start gap-2">
+                  <img [src]="imagePreview()" alt="Vista previa" class="rounded border"
+                    style="width: 180px; height: 110px; object-fit: cover;">
+                  <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeImage()">Quitar</button>
+                </div>
+              }
+            </div>
+            <div class="row g-3 mb-3">
+              <div class="col-md-4">
+                <label class="form-label fw-semibold">Precio Base (S/) *</label>
+                <input type="number" formControlName="precioBase" class="form-control" min="0" step="0.01"
+                  [class.is-invalid]="field('precioBase').invalid && field('precioBase').touched">
+                @if (field('precioBase').invalid && field('precioBase').touched) {
+                  <div class="invalid-feedback">Precio requerido (mín. S/ 1).</div>
+                }
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-semibold">Duración (días) *</label>
+                <input type="number" formControlName="duracionDias" class="form-control" min="1"
+                  [class.is-invalid]="field('duracionDias').invalid && field('duracionDias').touched">
+                @if (field('duracionDias').invalid && field('duracionDias').touched) {
+                  <div class="invalid-feedback">Mínimo 1 día.</div>
+                }
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-semibold">Lugar *</label>
+                <select formControlName="idLugar" class="form-select"
+                  [class.is-invalid]="field('idLugar').invalid && field('idLugar').touched">
+                  <option value="">Selecciona un lugar</option>
+                  @for (l of lugares(); track l.idLugar) {
+                    <option [value]="l.idLugar">{{ l.ciudad }}</option>
+                  }
+                </select>
+                @if (field('idLugar').invalid && field('idLugar').touched) {
+                  <div class="invalid-feedback">Selecciona un lugar.</div>
+                }
+              </div>
+            </div>
+            <div class="d-flex gap-2 justify-content-end">
+              <button type="button" class="btn btn-outline-secondary" (click)="closeForm()">Cancelar</button>
+              <button type="submit" class="btn text-white fw-bold" [disabled]="saving()"
+                style="background: #4c1d95;">
+                @if (saving()) { <span class="spinner-border spinner-border-sm me-1"></span> }
+                {{ editingId() ? 'Actualizar' : 'Crear' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+}

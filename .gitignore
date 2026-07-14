@@ -1,0 +1,30 @@
+# Environment secrets — NEVER commit
+.env
+.env.local
+.env.*.local
+
+# Build outputs
+frontend-angular/dist/
+frontend/dist/
+backend/target/
+*/target/
+
+# Node
+node_modules/
+npm-debug.log*
+
+# Java
+*.class
+*.jar
+*.war
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.suo
+*.user
+
+# OS
+.DS_Store
+Thumbs.db

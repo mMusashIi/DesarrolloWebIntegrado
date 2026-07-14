@@ -1,0 +1,185 @@
+<!-- HERO SECTION — video de fondo igual que React -->
+<section class="hero-section">
+  <div class="video-background">
+    <video #heroVideo autoplay loop muted playsinline preload="auto" class="video-element"
+      poster="/images/illustration.png" aria-label="Paisajes turísticos de Ica">
+      <source src="/videos/ica-loop.mp4" type="video/mp4">
+    </video>
+    <div class="video-overlay"></div>
+  </div>
+
+  <div class="container position-relative text-white" style="z-index: 2;">
+    <div class="row w-100">
+      <div class="col-lg-10 col-xl-8">
+        <h1 class="display-4 fw-bold mb-4">Descubre la Magia de Ica</h1>
+        <p class="lead fw-light mb-5" style="font-size: 1.25rem;">
+          Experiencias turísticas personalizadas, confiables y memorables en Ica,
+          Paracas y Nazca. Combina cultura, naturaleza y aventura con nosotros.
+        </p>
+        <div class="d-flex flex-wrap gap-3">
+          <a routerLink="/paquetes" class="btn btn-light btn-lg fw-bold" style="color: var(--primary-color); border-radius: 25px;">
+            <i class="fas fa-map-marked-alt me-2"></i>Ver Paquetes
+          </a>
+          <a routerLink="/reservas" class="btn btn-outline-light btn-lg fw-bold" style="border-radius: 25px;">
+            <i class="fas fa-calendar-plus me-2"></i>Reservar Ahora
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS SECTION -->
+<section class="stats-section">
+  <div class="container">
+    <div class="row text-center">
+      @for (stat of stats; track stat.label) {
+        <div class="col-md-3 col-6 mb-4">
+          <div class="stat-number">{{ stat.value }}</div>
+          <p class="mb-0">{{ stat.label }}</p>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- FEATURED PACKAGES -->
+<section class="section-padding" style="background-color: var(--background-light);">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="section-title">Nuestros Paquetes Destacados</h2>
+      <p class="section-subtitle">Experiencias diseñadas para que nunca olvides tu visita a Ica</p>
+    </div>
+
+    @if (loading()) {
+      <app-loading-spinner></app-loading-spinner>
+    } @else if (paquetes().length === 0) {
+      <div class="text-center py-5 text-muted">
+        <p class="fs-5">No hay paquetes disponibles en este momento.</p>
+      </div>
+    } @else {
+      <div class="row g-4">
+        @for (paquete of paquetes().slice(0, 3); track paquete.idPaquete) {
+          <div class="col-md-4">
+            <div class="card card-custom h-100">
+              <img [src]="getImageUrl(paquete)" [alt]="paquete.nombrePaquete"
+                class="card-img-top" style="height: 220px; object-fit: cover;">
+              <div class="card-body d-flex flex-column">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <span class="badge" style="background: #f3e8ff; color: var(--primary-color);">
+                    <i class="fas fa-map-marker-alt me-1"></i>{{ paquete.lugar?.ciudad || 'Ica' }}
+                  </span>
+                  <span class="badge" style="background: #f0fdf4; color: #15803d;">
+                    <i class="far fa-clock me-1"></i>{{ paquete.duracionDias }} día(s)
+                  </span>
+                </div>
+                <h5 class="card-title fw-bold mt-2">{{ paquete.nombrePaquete }}</h5>
+                <p class="card-text text-muted flex-grow-1" style="font-size: 0.9rem;">
+                  {{ paquete.descripcion | slice:0:100 }}{{ (paquete.descripcion?.length ?? 0) > 100 ? '...' : '' }}
+                </p>
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                  <span class="price-tag">S/ {{ paquete.precioBase | number:'1.2-2' }}</span>
+                  <span class="text-muted small">
+                    <i class="fas fa-users me-1"></i>{{ getCuposPaquete(paquete.idPaquete) }} cupos
+                  </span>
+                </div>
+                <a routerLink="/paquetes" class="btn btn-primary-custom mt-3 text-white text-center">
+                  Ver detalles
+                </a>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+      <div class="text-center mt-4">
+        <a routerLink="/paquetes" class="btn btn-secondary-custom btn-lg">
+          Ver todos los paquetes <i class="fas fa-arrow-right ms-2"></i>
+        </a>
+      </div>
+    }
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="section-padding bg-white">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="section-title">Lo que dicen nuestros viajeros</h2>
+      <p class="section-subtitle">Más de 1,500 viajeros satisfechos avalan nuestra calidad</p>
+    </div>
+    <div class="row g-4">
+      @for (t of testimonios; track t.nombre) {
+        <div class="col-md-4">
+          <div class="testimonial-card card-custom p-4">
+            <div class="text-warning mb-3">
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+            </div>
+            <p class="text-muted fst-italic mb-4">"{{ t.texto }}"</p>
+            <div class="d-flex align-items-center justify-content-center">
+              <div class="rounded-circle text-white fw-bold d-flex align-items-center justify-content-center me-3"
+                style="width:48px; height:48px; background: var(--primary-color); min-width:48px; font-size: 1.2rem;">
+                {{ t.nombre[0] }}
+              </div>
+              <div class="text-start">
+                <div class="fw-semibold">{{ t.nombre }}</div>
+                <div class="text-muted small">{{ t.origen }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- CTA SECTION -->
+<section class="py-5 text-white" style="background-color: var(--primary-color);">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-8">
+        <h3 class="mb-3 text-white">¿Listo para vivir tu aventura en Ica?</h3>
+        <p class="mb-0 text-white-50">Contáctanos y planifiquemos juntos tu experiencia perfecta.</p>
+      </div>
+      <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+        <a routerLink="/contacto" class="btn btn-light btn-lg fw-bold" style="color: var(--primary-color); border-radius: 25px;">
+          <i class="fas fa-envelope me-2"></i>Contáctanos
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MAP SECTION -->
+<section class="section-padding bg-white">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-10 text-center mb-5">
+        <h2 class="section-title mb-3">Conoce la magia de Ica con Nosotros</h2>
+        <p class="section-subtitle fw-light fs-5">
+          Visita nuestra sede principal para planificar tu itinerario perfecto. Somos el punto donde
+          la cultura, la naturaleza y la aventura se unen para crear tu experiencia inolvidable.
+        </p>
+        <p class="lead fw-bold text-primary-custom">
+          ¡Nuestro equipo de expertos te espera en el corazón de Ica para una asesoría personalizada!
+        </p>
+      </div>
+    </div>
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+        <div class="card-custom overflow-hidden shadow-lg" style="height: 450px; border-radius: 20px;">
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d241.90633260137923!2d-75.7515166059221!3d-14.04754801787607!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9110e2d347f27643%3A0x6a1c6324680980eb!2sBuganvilla%20Tours!5e0!3m2!1ses-419!2spe!4v1765087176809!5m2!1ses-419!2spe"
+            width="100%" height="100%" style="border: 0;"
+            allowfullscreen loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            title="Mapa de Buganvilla Tours">
+          </iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

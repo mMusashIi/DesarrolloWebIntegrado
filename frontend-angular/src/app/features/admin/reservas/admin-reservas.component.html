@@ -1,0 +1,67 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4 class="fw-bold mb-0">📋 Gestión de Reservas</h4>
+  <button class="btn btn-outline-secondary btn-sm" (click)="load()">🔄 Actualizar</button>
+</div>
+
+@if (loading()) {
+  <app-loading-spinner></app-loading-spinner>
+} @else {
+  <div class="card">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>#</th>
+            <th>Comprador</th>
+            <th>Viajeros / clientes</th>
+            <th>Paquete</th>
+            <th>Personas</th>
+            <th>Fecha Reserva</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (r of reservas(); track r.idReserva) {
+            <tr>
+              <td>{{ r.idReserva }}</td>
+              <td class="fw-semibold">{{ r.nombreComprador || '—' }}</td>
+              <td>
+                <div>{{ r.nombresViajeros || r.nombreCliente || '—' }}</div>
+                @if (r.telefonosViajeros) { <div class="text-muted small">{{ r.telefonosViajeros }}</div> }
+                @if (r.emailCliente) { <div class="text-muted small">{{ r.emailCliente }}</div> }
+              </td>
+              <td>
+                <div>{{ r.nombrePaquete || '—' }}</div>
+                <div class="text-muted small">{{ r.fechaViaje || '' }}</div>
+              </td>
+              <td>{{ r.cantidadPersonas }}</td>
+              <td>{{ r.fechaReserva || '—' }}</td>
+              <td>
+                <span class="badge" [style.background]="getBadgeStyle(r.estado).background"
+                  [style.color]="getBadgeStyle(r.estado).color">
+                  {{ r.estado }}
+                </span>
+              </td>
+              <td>
+                @if (r.estado !== 'cancelada') {
+                  <button class="btn btn-sm btn-outline-danger"
+                    [disabled]="canceling() === r.idReserva"
+                    (click)="cancelar(r.idReserva)">
+                    @if (canceling() === r.idReserva) {
+                      <span class="spinner-border spinner-border-sm"></span>
+                    } @else {
+                      Cancelar
+                    }
+                  </button>
+                }
+              </td>
+            </tr>
+          } @empty {
+            <tr><td colspan="8" class="text-center text-muted py-4">No hay reservas registradas.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+}

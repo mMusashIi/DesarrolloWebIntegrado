@@ -1,0 +1,42 @@
+<div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,.5);">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title fw-bold">Mi perfil</h5>
+        <button type="button" class="btn-close" (click)="close.emit()"></button>
+      </div>
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <div class="modal-body">
+          @if (error()) { <div class="alert alert-danger">{{ error() }}</div> }
+          <div class="row g-3">
+            <div class="col-md-6"><label class="form-label">Nombre</label><input class="form-control" formControlName="nombre"></div>
+            <div class="col-md-6"><label class="form-label">Apellido</label><input class="form-control" formControlName="apellido"></div>
+            <div class="col-12">
+              <label class="form-label">Celular para WhatsApp</label>
+              <div class="input-group">
+                <select class="form-select" formControlName="prefijoTelefono" style="max-width: 155px;">
+                  @for (country of countries; track country.code) {
+                    <option [value]="country.dialCode">{{ country.code }} {{ country.dialCode }}</option>
+                  }
+                </select>
+                <input type="tel" inputmode="numeric" class="form-control" formControlName="telefono" placeholder="987654321">
+              </div>
+              <div class="form-text">Se guardará con código internacional para recibir tus comprobantes.</div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Nacionalidad</label>
+              <select class="form-select" formControlName="nacionalidad">
+                @for (country of countries; track country.code) { <option [value]="country.name">{{ country.name }}</option> }
+              </select>
+            </div>
+            <div class="col-md-6"><label class="form-label">DNI / documento</label><input class="form-control" formControlName="dni"></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" (click)="close.emit()">Cancelar</button>
+          <button type="submit" class="btn btn-primary-custom" [disabled]="loading()">Guardar cambios</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

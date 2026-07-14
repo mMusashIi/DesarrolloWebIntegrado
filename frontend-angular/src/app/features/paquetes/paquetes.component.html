@@ -1,0 +1,176 @@
+<!-- Page Header -->
+<section class="py-5"
+  style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white;">
+  <div class="container">
+    <div class="text-center">
+      <h1 class="display-4 mb-3">Nuestros Paquetes Turísticos</h1>
+      <p class="lead">Descubre experiencias únicas en Ica, Paracas y Nazca</p>
+    </div>
+  </div>
+</section>
+
+<!-- Filters -->
+<section class="py-3 bg-white shadow-sm sticky-top" style="top: 80px; z-index: 100;">
+  <div class="container">
+    <div class="row g-3 align-items-center">
+      <div class="col-md-6">
+        <input type="text" class="form-control form-control-custom" placeholder="Buscar por nombre, ciudad o descripción..."
+          [ngModel]="searchText()" (ngModelChange)="searchText.set($event)">
+      </div>
+      <div class="col-md-3">
+        <select class="form-select form-control-custom" [ngModel]="filtroEstado()" (ngModelChange)="filtroEstado.set($event)">
+          <option value="activo">Solo activos</option>
+          <option value="">Todos los estados</option>
+        </select>
+      </div>
+      <div class="col-md-3 text-muted small">
+        {{ filteredPaquetes().length }} paquete(s) encontrado(s)
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Package Grid -->
+<section class="section-padding" style="background-color: var(--background-light);">
+  <div class="container">
+    @if (loading()) {
+      <app-loading-spinner></app-loading-spinner>
+    } @else if (filteredPaquetes().length === 0) {
+      <div class="text-center py-5">
+        <i class="fas fa-search fa-3x text-muted mb-3"></i>
+        <h4 class="text-muted">No se encontraron paquetes</h4>
+        <p class="text-muted">Intenta con otros términos de búsqueda</p>
+        <button class="btn btn-outline-secondary" (click)="searchText.set(''); filtroEstado.set('activo')">
+          Limpiar filtros
+        </button>
+      </div>
+    } @else {
+      <div class="row g-4">
+        @for (paquete of filteredPaquetes(); track paquete.idPaquete) {
+          <div class="col-md-4 col-lg-4">
+            <div class="card card-custom h-100">
+              <div class="position-relative">
+                <img [src]="getImageUrl(paquete)" [alt]="paquete.nombrePaquete"
+                  class="card-img-top" style="height: 220px; object-fit: cover;">
+                <span class="package-badge">
+                  {{ paquete.estado === 'activo' ? 'Activo' : paquete.estado }}
+                </span>
+              </div>
+              <div class="card-body d-flex flex-column">
+                <div class="d-flex gap-2 mb-2">
+                  <span class="badge" style="background: #f3e8ff; color: var(--primary-color);">
+                    <i class="fas fa-map-marker-alt me-1"></i>{{ paquete.lugar?.ciudad || 'Ica' }}
+                  </span>
+                  <span class="badge" style="background: #fce7f3; color: #db2777;">
+                    <i class="far fa-clock me-1"></i>{{ paquete.duracionDias }} día(s)
+                  </span>
+                </div>
+                <h5 class="card-title fw-bold">{{ paquete.nombrePaquete }}</h5>
+                <p class="card-text text-muted flex-grow-1" style="font-size: 0.9rem;">
+                  {{ paquete.descripcion | slice:0:120 }}{{ (paquete.descripcion?.length ?? 0) > 120 ? '...' : '' }}
+                </p>
+                <div class="d-flex justify-content-between align-items-center mt-3 mb-2">
+                  <span class="price-tag">S/ {{ paquete.precioBase | number:'1.2-2' }}</span>
+                  <span class="text-muted small">
+                    @if (getCuposTotal(paquete.idPaquete) > 0) {
+                      <i class="fas fa-check-circle text-success me-1"></i>{{ getCuposTotal(paquete.idPaquete) }} cupos
+                    } @else {
+                      <span class="text-danger"><i class="fas fa-times-circle me-1"></i>Sin cupos</span>
+                    }
+                  </span>
+                </div>
+                <button class="btn btn-primary-custom text-white mt-2" (click)="openModal(paquete)">
+                  Ver detalles
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</section>
+
+<!-- Package Detail Modal -->
+@if (selectedPaquete()) {
+  <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header" style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white;">
+          <h5 class="modal-title fw-bold">{{ selectedPaquete()!.nombrePaquete }}</h5>
+          <button type="button" class="btn-close btn-close-white" (click)="closeModal()"></button>
+        </div>
+        <div class="modal-body p-0">
+          <img [src]="getImageUrl(selectedPaquete()!)" [alt]="selectedPaquete()!.nombrePaquete"
+            class="img-fluid w-100" style="max-height: 300px; object-fit: cover;">
+          <div class="p-4">
+            <div class="d-flex gap-2 mb-3">
+              <span class="badge fs-6" style="background: #f3e8ff; color: var(--primary-color);">
+                <i class="fas fa-map-marker-alt me-1"></i>{{ selectedPaquete()!.lugar?.ciudad || 'Ica' }}
+              </span>
+              <span class="badge fs-6" style="background: #fce7f3; color: #db2777;">
+                <i class="far fa-clock me-1"></i>{{ selectedPaquete()!.duracionDias }} día(s)
+              </span>
+            </div>
+            <p class="text-muted">{{ selectedPaquete()!.descripcion }}</p>
+
+            <div class="border-top pt-3 mt-3">
+              <h6 class="fw-bold">Fechas Disponibles</h6>
+              @if (getInventarioByPaquete(selectedPaquete()!.idPaquete).length === 0) {
+                <p class="text-muted">No hay fechas disponibles actualmente.</p>
+              } @else {
+                <div class="row g-2">
+                  @for (inv of getInventarioByPaquete(selectedPaquete()!.idPaquete); track inv.idInventario) {
+                    <div class="col-auto">
+                      <button class="btn btn-sm"
+                        [class.btn-outline-secondary]="selectedInventario()?.idInventario !== inv.idInventario"
+                        [class.btn-primary-custom]="selectedInventario()?.idInventario === inv.idInventario"
+                        (click)="selectedInventario.set(inv)">
+                        {{ inv.fechaSalida }} — {{ inv.cupoDisponible }} cupos
+                      </button>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-4">
+              <div>
+                <span class="text-muted small">Precio por persona</span>
+                <div class="fs-3 fw-bold text-primary-custom">
+                  S/ {{ selectedPaquete()!.precioBase | number:'1.2-2' }}
+                </div>
+              </div>
+              @if (getInventarioByPaquete(selectedPaquete()!.idPaquete).length > 0) {
+                <a routerLink="/reservas" class="btn btn-lg btn-primary-custom text-white"
+                  (click)="closeModal()">
+                  <i class="fas fa-calendar-plus me-2"></i>Reservar Ahora
+                </a>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Auth Required Modal -->
+@if (showAuthModal()) {
+  <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content text-center p-4">
+        <div class="mb-3">
+          <i class="fas fa-lock fa-3x text-primary-custom"></i>
+        </div>
+        <h5 class="fw-bold">Autenticación Requerida</h5>
+        <p class="text-muted">Necesitas iniciar sesión para realizar una reserva.</p>
+        <div class="d-flex gap-2 justify-content-center mt-3">
+          <button class="btn btn-outline-secondary" (click)="showAuthModal.set(false)">Cancelar</button>
+          <a routerLink="/register" class="btn btn-primary-custom text-white"
+            (click)="showAuthModal.set(false)">Registrarse</a>
+        </div>
+      </div>
+    </div>
+  </div>
+}

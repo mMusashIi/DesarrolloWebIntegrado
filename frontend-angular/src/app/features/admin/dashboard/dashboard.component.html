@@ -1,0 +1,80 @@
+<h4 class="fw-bold mb-4">📊 Dashboard</h4>
+
+@if (loading()) {
+  <app-loading-spinner></app-loading-spinner>
+} @else {
+  <!-- Stats Cards -->
+  <div class="row g-4 mb-5">
+    <div class="col-md-4">
+      <div class="card p-4 text-center h-100" style="border-left: 4px solid #4c1d95;">
+        <div class="display-5 mb-2">📋</div>
+        <div class="display-6 fw-bold" style="color: #4c1d95;">{{ totalReservas() }}</div>
+        <div class="text-muted">Reservas totales</div>
+        <a routerLink="/admin/reservas" class="btn btn-sm btn-outline-secondary mt-3">Ver todas</a>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card p-4 text-center h-100" style="border-left: 4px solid #db2777;">
+        <div class="display-5 mb-2">🏔️</div>
+        <div class="display-6 fw-bold" style="color: #db2777;">{{ totalPaquetes() }}</div>
+        <div class="text-muted">Paquetes turísticos</div>
+        <a routerLink="/admin/paquetes" class="btn btn-sm btn-outline-secondary mt-3">Gestionar</a>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card p-4 text-center h-100" style="border-left: 4px solid #059669;">
+        <div class="display-5 mb-2">👥</div>
+        <div class="display-6 fw-bold" style="color: #059669;">{{ totalUsuarios() }}</div>
+        <div class="text-muted">Usuarios registrados</div>
+        <a routerLink="/admin/usuarios" class="btn btn-sm btn-outline-secondary mt-3">Ver todos</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Reservations -->
+  <div class="card p-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="fw-bold mb-0">Reservas recientes</h5>
+      <a routerLink="/admin/reservas" class="btn btn-sm btn-outline-primary">Ver todas</a>
+    </div>
+    @if (reservasRecientes().length === 0) {
+      <p class="text-muted text-center py-3">No hay reservas aún.</p>
+    } @else {
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead class="table-light">
+            <tr>
+              <th>#</th>
+              <th>Cliente</th>
+              <th>Estado</th>
+              <th>Fecha</th>
+              <th>Personas</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (r of reservasRecientes(); track r.idReserva) {
+              <tr>
+                <td>{{ r.idReserva }}</td>
+                <td>
+                  <strong>{{ r.nombreComprador || r.usuario?.nombre || '—' }}</strong>
+                  @if (r.nombreCliente && r.nombreCliente !== r.nombreComprador) {
+                    <div class="small text-muted">Viaja: {{ r.nombreCliente }}</div>
+                  }
+                </td>
+                <td>
+                  <span class="badge"
+                    [style.background]="r.estado === 'confirmada' ? '#d1fae5' : r.estado === 'pendiente' ? '#fef3c7' : '#fee2e2'"
+                    [style.color]="r.estado === 'confirmada' ? '#065f46' : r.estado === 'pendiente' ? '#92400e' : '#991b1b'">
+                    {{ r.estado }}
+                  </span>
+                </td>
+                <td>{{ r.fechaReserva || '—' }}</td>
+                <td>{{ r.cantidadPersonas }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+}
