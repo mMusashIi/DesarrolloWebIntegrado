@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -82,6 +83,12 @@ public class MercadoPagoController {
         log.info("MP pago-exitoso recibido — paymentId: {}, status: {}, reservaId: {}",
                 paymentId, collectionStatus, externalReference);
 
+        // Fallback: si el webhook de MP no llegó (ej. ngrok caído), procesamos el pago
+        // directamente usando el payment_id que MP nos envía en el redirect.
+        if (paymentId != null && !paymentId.isBlank() && "approved".equalsIgnoreCase(collectionStatus)) {
+            procesarPagoAsync(paymentId);
+        }
+
         String redirectUrl = UriComponentsBuilder.fromUriString(frontendUrl)
                 .path("/pago-exitoso")
                 .queryParam("payment", "success")
@@ -93,6 +100,22 @@ public class MercadoPagoController {
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.LOCATION, redirectUrl);
         return new ResponseEntity<>(headers, HttpStatus.FOUND);
+    }
+
+    /**
+     * Procesa el webhook de MP de forma asíncrona como fallback del back URL.
+     * Al ser asíncrono, no bloquea la redirección al usuario.
+     * El método procesarWebhook es idempotente, así que si el webhook ya llegó
+     * antes, simplemente detectará que el payment_id ya fue procesado y lo ignorará.
+     */
+    @Async
+    protected void procesarPagoAsync(String paymentId) {
+        try {
+            log.info("[Fallback back-URL] Procesando pago async para paymentId={}", paymentId);
+            mercadoPagoService.procesarWebhook(paymentId);
+        } catch (Exception e) {
+            log.error("[Fallback back-URL] Error procesando pago async paymentId={}: {}", paymentId, e.getMessage(), e);
+        }
     }
 
     /**
