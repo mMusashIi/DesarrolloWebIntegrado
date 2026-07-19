@@ -1,0 +1,80 @@
+name: "\U0001F680 Deploy a Azure VM"
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    name: "Deploy via SSH"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: "Conectar a VM y desplegar"
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.AZURE_VM_HOST }}
+          username: ${{ secrets.AZURE_VM_USER }}
+          key: ${{ secrets.AZURE_VM_SSH_KEY }}
+          script: |
+            set -e
+            cd ${{ secrets.DEPLOY_PATH }}
+
+            # 1. Actualizar código
+            git pull origin main
+
+            # 2. Generar .env con los secretos de GitHub
+            #    Nota: los secretos no deben contener caracteres especiales como $ o "
+            {
+              echo "# Generado automáticamente por GitHub Actions — no editar manualmente"
+              echo ""
+              echo "# Base de datos"
+              echo "DB_USERNAME=sa"
+              echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}"
+              echo ""
+              echo "# JWT"
+              echo "JWT_SECRET=${{ secrets.JWT_SECRET }}"
+              echo "JWT_EXPIRATION=86400000"
+              echo ""
+              echo "# Token interno entre microservicios"
+              echo "INTERNAL_SERVICE_TOKEN=${{ secrets.INTERNAL_SERVICE_TOKEN }}"
+              echo ""
+              echo "# CORS — incluye el dominio de Azure"
+              echo "CORS_ALLOWED_ORIGINS=https://${{ secrets.CADDY_DOMAIN }},http://localhost,http://localhost:80"
+              echo ""
+              echo "# Logging (INFO en producción)"
+              echo "LOG_LEVEL=INFO"
+              echo "SHOW_SQL=false"
+              echo ""
+              echo "# Caddy — dominio público para HTTPS automático"
+              echo "CADDY_DOMAIN=${{ secrets.CADDY_DOMAIN }}"
+              echo ""
+              echo "# MercadoPago (sandbox — solo demostración)"
+              echo "MP_ACCESS_TOKEN=${{ secrets.MP_ACCESS_TOKEN }}"
+              echo "MP_PUBLIC_KEY=${{ secrets.MP_PUBLIC_KEY }}"
+              echo "MP_BACK_URL_SUCCESS=https://${{ secrets.CADDY_DOMAIN }}/reservas?payment=success"
+              echo "MP_BACK_URL_FAILURE=https://${{ secrets.CADDY_DOMAIN }}/reservas?payment=failure"
+              echo "MP_BACK_URL_PENDING=https://${{ secrets.CADDY_DOMAIN }}/reservas?payment=pending"
+              echo "MP_NOTIFICATION_URL=https://${{ secrets.CADDY_DOMAIN }}/api/mercadopago/webhook"
+              echo "APP_FRONTEND_URL=https://${{ secrets.CADDY_DOMAIN }}"
+              echo ""
+              echo "# WhatsApp Cloud API (modo test)"
+              echo "WHATSAPP_ENABLED=true"
+              echo "WHATSAPP_PROVIDER=meta"
+              echo "WHATSAPP_API_VERSION=v25.0"
+              echo "WHATSAPP_ACCESS_TOKEN=${{ secrets.WHATSAPP_ACCESS_TOKEN }}"
+              echo "WHATSAPP_PHONE_NUMBER_ID=${{ secrets.WHATSAPP_PHONE_NUMBER_ID }}"
+              echo "WHATSAPP_BUSINESS_ACCOUNT_ID=${{ secrets.WHATSAPP_BUSINESS_ACCOUNT_ID }}"
+              echo ""
+              echo "# APIs.net.pe — consulta DNI"
+              echo "APIS_NET_TOKEN=${{ secrets.APIS_NET_TOKEN }}"
+            } > .env
+
+            # 3. Desplegar
+            docker compose up --build -d
+
+            # 4. Mostrar estado de los contenedores
+            echo "──────────────────────────────────"
+            echo "Estado del stack:"
+            docker compose ps
+            echo "──────────────────────────────────"

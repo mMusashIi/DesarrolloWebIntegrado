@@ -83,7 +83,7 @@ public class MercadoPagoController {
         log.info("MP pago-exitoso recibido — paymentId: {}, status: {}, reservaId: {}",
                 paymentId, collectionStatus, externalReference);
 
-        // Fallback: si el webhook de MP no llegó (ej. ngrok caído), procesamos el pago
+        // Fallback: si el webhook de MP no llegó, procesamos el pago
         // directamente usando el payment_id que MP nos envía en el redirect.
         if (paymentId != null && !paymentId.isBlank() && "approved".equalsIgnoreCase(collectionStatus)) {
             procesarPagoAsync(paymentId);

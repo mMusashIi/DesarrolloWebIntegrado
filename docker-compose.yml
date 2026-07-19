@@ -1,5 +1,26 @@
 services:
 
+  # ──────────────────────────────────────────────────────────
+  # Caddy — reverse proxy con HTTPS automático (Let's Encrypt)
+  # En local usa HTTP (localhost). En Azure usa el dominio real.
+  # ──────────────────────────────────────────────────────────
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    environment:
+      CADDY_DOMAIN: "${CADDY_DOMAIN:-localhost}"
+    networks:
+      - buganvilla-net
+    depends_on:
+      - frontend-angular
+
   sqlserver:
     restart: unless-stopped
     build:
@@ -268,6 +289,8 @@ services:
 
 volumes:
   sqlserver_data:
+  caddy_data:
+  caddy_config:
 
 networks:
   buganvilla-net:

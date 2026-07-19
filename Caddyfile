@@ -1,0 +1,14 @@
+# Buganvilla Tours — Caddy reverse proxy
+# En producción: obtiene HTTPS automático de Let's Encrypt
+# En local: usa HTTP (localhost no requiere certificado)
+
+{$CADDY_DOMAIN:localhost} {
+    # Redirige todo al frontend Angular (nginx interno)
+    # nginx ya maneja el proxy /api/ → api-gateway:8080
+    reverse_proxy frontend-angular:80
+
+    # HSTS para producción HTTPS
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+    }
+}
