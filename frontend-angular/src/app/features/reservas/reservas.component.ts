@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject, computed } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormArray, FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { InventarioService } from '../../core/services/inventario.service';
@@ -18,7 +18,7 @@ import { NATIONAL_PHONE_PATTERN, PHONE_COUNTRIES, splitE164, toE164 } from '../.
   imports: [CommonModule, ReactiveFormsModule, LoadingSpinnerComponent],
   templateUrl: './reservas.component.html'
 })
-export class ReservasComponent implements OnInit {
+export class ReservasComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private inventarioService = inject(InventarioService);
   private reservasService = inject(ReservasService);
@@ -41,6 +41,14 @@ export class ReservasComponent implements OnInit {
   filtroCompras = signal<'todas' | 'pendiente' | 'confirmada' | 'cancelada'>('todas');
   cancelandoId = signal<number | null>(null);
   pagandoId = signal<number | null>(null);
+
+  /** Estado del popup de MercadoPago */
+  pagoPopupAbierto = signal(false);
+  pagoResultado = signal<'success' | 'failure' | 'cancelled' | null>(null);
+  pagoReservaId = signal<number | null>(null);
+
+  private mpPopup: Window | null = null;
+  private popupInterval: ReturnType<typeof setInterval> | null = null;
 
   comprasFiltradas = computed(() => {
     const filtro = this.filtroCompras();
@@ -80,6 +88,10 @@ export class ReservasComponent implements OnInit {
     });
     this.loadMisReservas();
     this.form.get('cantidadPersonas')?.valueChanges.subscribe(value => this.syncViajeros(+value || 1));
+  }
+
+  ngOnDestroy(): void {
+    this.detenerPolling();
   }
 
   get viajerosAdicionales(): FormArray {
@@ -187,11 +199,11 @@ export class ReservasComponent implements OnInit {
         const descripcion = paquete?.nombrePaquete || inv?.nombrePaquete || 'Reserva Buganvilla Tours';
         this.reservasService.crearPreferenciaMP(reserva.idReserva, this.precioTotal, descripcion, cantidadPersonas).subscribe({
           next: (mp) => {
-            this.initPoint.set(mp.initPoint);
             this.submitting.set(false);
+            this.abrirMercadoPago(mp.initPoint, reserva.idReserva);
           },
           error: () => {
-            this.successMsg.set('Reserva creada. Podrás pagar luego desde tu perfil.');
+            this.successMsg.set('Reserva creada. Podrás pagar luego desde Mis compras.');
             this.submitting.set(false);
           }
         });
@@ -265,13 +277,77 @@ export class ReservasComponent implements OnInit {
     this.reservasService.crearPreferenciaMP(r.idReserva, precioTotal, descripcion, r.cantidadPersonas).subscribe({
       next: (mp) => {
         this.pagandoId.set(null);
-        window.location.href = mp.initPoint;
+        this.abrirMercadoPago(mp.initPoint, r.idReserva);
       },
       error: () => {
         this.pagandoId.set(null);
         this.error.set('No se pudo generar el enlace de pago.');
       }
     });
+  }
+
+  /** Abre el checkout de MercadoPago en popup y monitorea su cierre */
+  abrirMercadoPago(url: string, reservaId: number): void {
+    this.detenerPolling();
+    this.pagoResultado.set(null);
+    this.pagoReservaId.set(reservaId);
+
+    const ancho = Math.min(960, window.screen.width - 80);
+    const alto  = Math.min(700, window.screen.height - 80);
+    const left  = Math.round((window.screen.width  - ancho) / 2);
+    const top   = Math.round((window.screen.height - alto)  / 2);
+    const opts  = `width=${ancho},height=${alto},left=${left},top=${top},menubar=no,toolbar=no,location=no,status=no`;
+
+    this.mpPopup = window.open(url, 'mp_checkout', opts);
+    if (!this.mpPopup) {
+      // Bloqueador de popups activo — fallback a nueva pestaña
+      window.open(url, '_blank');
+      return;
+    }
+
+    this.pagoPopupAbierto.set(true);
+
+    // Polling: cada 3 s comprueba si la reserva cambió de estado
+    this.popupInterval = setInterval(() => {
+      const popupCerrado = !this.mpPopup || this.mpPopup.closed;
+
+      this.reservasService.getById(reservaId).subscribe({
+        next: (reserva) => {
+          if (reserva.estado === 'confirmada') {
+            this.cerrarPopupConResultado('success');
+          } else if (reserva.estado === 'cancelada') {
+            this.cerrarPopupConResultado('failure');
+          } else if (popupCerrado) {
+            // Popup cerrado sin que se confirmara el pago
+            this.cerrarPopupConResultado('cancelled');
+          }
+        },
+        error: () => {
+          if (popupCerrado) this.cerrarPopupConResultado('cancelled');
+        }
+      });
+    }, 3000);
+  }
+
+  private cerrarPopupConResultado(resultado: 'success' | 'failure' | 'cancelled'): void {
+    this.detenerPolling();
+    if (this.mpPopup && !this.mpPopup.closed) this.mpPopup.close();
+    this.pagoPopupAbierto.set(false);
+    this.pagoResultado.set(resultado);
+    this.reservaCreada.set(null);
+    this.loadMisReservas();
+  }
+
+  private detenerPolling(): void {
+    if (this.popupInterval !== null) {
+      clearInterval(this.popupInterval);
+      this.popupInterval = null;
+    }
+  }
+
+  cerrarResultado(): void {
+    this.pagoResultado.set(null);
+    this.pagoReservaId.set(null);
   }
 
   estadoLabel(estado: Reserva['estado']): string {

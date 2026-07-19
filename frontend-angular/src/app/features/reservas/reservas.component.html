@@ -64,24 +64,59 @@
       }
     </div>
     @if (reservaCreada()) {
-      <!-- SUCCESS STATE -->
+      <!-- POPUP ABIERTO: pantalla de espera -->
+      @if (pagoPopupAbierto()) {
+        <div class="row justify-content-center">
+          <div class="col-md-8">
+            <div class="reservation-form text-center">
+              <div class="mb-4" style="width:72px;height:72px;border-radius:50%;background:rgba(0,158,227,0.12);display:inline-flex;align-items:center;justify-content:center;">
+                <span class="spinner-border" style="width:2.5rem;height:2.5rem;color:#009ee3;"></span>
+              </div>
+              <h3 class="fw-bold mb-2" style="color:#009ee3;">Procesando tu pago</h3>
+              <p class="text-muted">Se abrió una ventana con MercadoPago.<br>Completa el pago allí y esta página se actualizará automáticamente.</p>
+              <p class="small text-muted mt-3">¿La ventana no se abrió?
+                <button class="btn btn-link p-0 small" (click)="abrirMercadoPago(initPoint(), pagoReservaId()!)">Haz clic aquí</button>
+              </p>
+            </div>
+          </div>
+        </div>
+      }
+    }
+
+    <!-- RESULTADO INLINE tras cerrarse el popup -->
+    @if (pagoResultado()) {
       <div class="row justify-content-center">
         <div class="col-md-8">
           <div class="reservation-form text-center">
-            <i class="fas fa-check-circle fa-4x text-success mb-4"></i>
-            <h3 class="fw-bold text-success">¡Reserva creada exitosamente!</h3>
-            <p class="text-muted">Reserva #{{ reservaCreada()!.idReserva }} — Estado: {{ reservaCreada()!.estado }}</p>
-            @if (initPoint()) {
-              <div class="mt-4">
-                <p class="fw-semibold">Completa tu pago con MercadoPago:</p>
-                <a [href]="initPoint()" target="_blank"
-                  class="btn btn-lg fw-bold text-white"
-                  style="background: linear-gradient(135deg, #009ee3, #00b1ea); border-radius: 25px;">
-                  <i class="fas fa-credit-card me-2"></i>Pagar con MercadoPago
-                </a>
+            @if (pagoResultado() === 'success') {
+              <div class="mb-4" style="width:80px;height:80px;border-radius:50%;background:rgba(5,150,105,0.1);display:inline-flex;align-items:center;justify-content:center;">
+                <i class="fas fa-check-circle fa-3x" style="color:#059669;"></i>
+              </div>
+              <h3 class="fw-bold" style="color:#059669;">¡Pago Exitoso!</h3>
+              <p class="text-muted">Tu reserva ha sido confirmada. Recibirás los detalles por WhatsApp.</p>
+              <span class="badge bg-success px-3 py-2 mb-4">Reserva confirmada</span>
+              <div class="mt-3">
+                <button class="btn btn-primary-custom" (click)="cerrarResultado(); filtroCompras.set('confirmada')">Ver mis reservas</button>
+              </div>
+            } @else if (pagoResultado() === 'failure') {
+              <div class="mb-4" style="width:80px;height:80px;border-radius:50%;background:rgba(220,38,38,0.1);display:inline-flex;align-items:center;justify-content:center;">
+                <i class="fas fa-times-circle fa-3x" style="color:#dc2626;"></i>
+              </div>
+              <h3 class="fw-bold" style="color:#dc2626;">Pago No Procesado</h3>
+              <p class="text-muted">No pudimos confirmar tu pago. Puedes intentarlo nuevamente.</p>
+              <div class="mt-3 d-flex gap-2 justify-content-center">
+                <button class="btn btn-outline-secondary" (click)="cerrarResultado()">Volver a mis reservas</button>
               </div>
             } @else {
-              <p class="text-muted mt-3">{{ successMsg() }}</p>
+              <div class="mb-4" style="width:80px;height:80px;border-radius:50%;background:rgba(217,119,6,0.1);display:inline-flex;align-items:center;justify-content:center;">
+                <i class="fas fa-times fa-3x" style="color:#d97706;"></i>
+              </div>
+              <h3 class="fw-bold" style="color:#d97706;">Pago Cancelado</h3>
+              <p class="text-muted">Cerraste la ventana de pago. Tu reserva sigue <strong>pendiente</strong>, puedes pagar en cualquier momento desde "Mis compras".</p>
+              <div class="mt-3 d-flex gap-2 justify-content-center">
+                <button class="btn btn-outline-secondary" (click)="cerrarResultado()">Volver a mis reservas</button>
+                <button class="btn btn-primary-custom" (click)="cerrarResultado(); pagarReserva(misReservas()[0])">Reintentar pago</button>
+              </div>
             }
           </div>
         </div>
