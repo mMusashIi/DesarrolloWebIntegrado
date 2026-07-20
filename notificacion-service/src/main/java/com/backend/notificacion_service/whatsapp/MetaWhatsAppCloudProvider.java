@@ -21,10 +21,10 @@ import java.util.Map;
  *   WHATSAPP_PHONE_NUMBER_ID=<tu-phone-number-id>
  *   WHATSAPP_ACCESS_TOKEN=<tu-access-token>
  *
- * Templates aprobados en Meta Business Manager:
- *   - reservation_confirm  → parámetros: nombre, paquete, fecha, personas, id_reserva
- *   - payment_confirm      → parámetros: nombre, monto, id_reserva
- *   - reservation_cancel   → parámetros: nombre, paquete
+ * Templates que debes crear en Meta Business Manager:
+ *   - reservation_confirmation  → parámetros: nombre, paquete, fecha, personas
+ *   - payment_confirmation      → parámetros: nombre, monto, id_reserva
+ *   - reservation_cancellation  → parámetros: nombre, paquete
  */
 @Slf4j
 @Component
@@ -46,7 +46,7 @@ public class MetaWhatsAppCloudProvider implements WhatsAppNotificationProvider {
     @Value("${whatsapp.access-token:}")
     private String accessToken;
 
-    @Value("${whatsapp.default-language:es_ES}")
+    @Value("${whatsapp.default-language:es}")
     private String defaultLanguage;
 
     private final RestClient restClient;
@@ -73,7 +73,7 @@ public class MetaWhatsAppCloudProvider implements WhatsAppNotificationProvider {
         if (!isEnabled()) return;
         // Usa el template 'payment_confirm'
         // Parámetros: {{1}}=nombre, {{2}}=monto, {{3}}=id_reserva
-        sendTemplateMessage(cleanPhone(phone), "payment_confirm", "es_ES", List.of(
+        sendTemplateMessage(cleanPhone(phone), "payment_confirm", defaultLanguage, List.of(
                 textParam(name),
                 textParam(amount.toPlainString()),
                 textParam(reservaId)
