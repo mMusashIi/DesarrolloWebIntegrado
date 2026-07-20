@@ -59,7 +59,7 @@ public class MetaWhatsAppCloudProvider implements WhatsAppNotificationProvider {
     public void sendReservationConfirmation(String phone, String name, String packageName, LocalDate date, int persons,
                                             String reservaId) {
         if (!isEnabled()) return;
-        sendTemplateMessage(cleanPhone(phone), "reservation_confirm", List.of(
+        sendTemplateMessage(cleanPhone(phone), "reservation_confirmation", List.of(
                 textParam(name),
                 textParam(packageName),
                 textParam(date.toString()),
@@ -71,9 +71,9 @@ public class MetaWhatsAppCloudProvider implements WhatsAppNotificationProvider {
     @Override
     public void sendPaymentConfirmation(String phone, String name, BigDecimal amount, String reservaId) {
         if (!isEnabled()) return;
-        // Usa el template 'payment_confirm'
+        // Usa el template 'payment_confirmation'
         // Parámetros: {{1}}=nombre, {{2}}=monto, {{3}}=id_reserva
-        sendTemplateMessage(cleanPhone(phone), "payment_confirm", defaultLanguage, List.of(
+        sendTemplateMessage(cleanPhone(phone), "payment_confirmation", defaultLanguage, List.of(
                 textParam(name),
                 textParam(amount.toPlainString()),
                 textParam(reservaId)
@@ -83,7 +83,7 @@ public class MetaWhatsAppCloudProvider implements WhatsAppNotificationProvider {
     @Override
     public void sendReservationCancellation(String phone, String name, String packageName) {
         if (!isEnabled()) return;
-        sendTemplateMessage(cleanPhone(phone), "reservation_cancel", List.of(
+        sendTemplateMessage(cleanPhone(phone), "reservation_cancellation", List.of(
                 textParam(name),
                 textParam(packageName)
         ));
