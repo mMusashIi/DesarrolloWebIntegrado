@@ -71,12 +71,12 @@ public class MetaWhatsAppCloudProvider implements WhatsAppNotificationProvider {
     @Override
     public void sendPaymentConfirmation(String phone, String name, BigDecimal amount, String reservaId) {
         if (!isEnabled()) return;
-        // Usa el template oficial 'order_confirmed' (aprobado en Meta)
-        // Parámetros: {{1}}=nombre, {{2}}=id_reserva, {{3}}=fecha_estimada
-        sendTemplateMessage(cleanPhone(phone), "order_confirmed", "en_US", List.of(
+        // Usa el template 'payment_confirmation'
+        // Parámetros: {{1}}=nombre, {{2}}=monto, {{3}}=id_reserva
+        sendTemplateMessage(cleanPhone(phone), "payment_confirmation", "es_ES", List.of(
                 textParam(name),
-                textParam("RES-" + reservaId),
-                textParam("S/ " + amount.toPlainString())
+                textParam(amount.toPlainString()),
+                textParam(reservaId)
         ));
     }
 
