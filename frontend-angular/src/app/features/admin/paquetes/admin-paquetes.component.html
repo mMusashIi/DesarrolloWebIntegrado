@@ -27,7 +27,7 @@
             <tr>
               <td>{{ p.idPaquete }}</td>
               <td class="fw-semibold">{{ p.nombrePaquete }}</td>
-              <td>{{ p.lugar?.ciudad || '—' }}</td>
+              <td>{{ p.lugar?.nombreLugar || '—' }}</td>
               <td>S/ {{ p.precioBase | number:'1.2-2' }}</td>
               <td>{{ p.duracionDias }}</td>
               <td>
@@ -124,7 +124,7 @@
                   [class.is-invalid]="field('idLugar').invalid && field('idLugar').touched">
                   <option value="">Selecciona un lugar</option>
                   @for (l of lugares(); track l.idLugar) {
-                    <option [value]="l.idLugar">{{ l.ciudad }}</option>
+                    <option [value]="l.idLugar">{{ l.nombreLugar }}</option>
                   }
                 </select>
                 @if (field('idLugar').invalid && field('idLugar').touched) {
