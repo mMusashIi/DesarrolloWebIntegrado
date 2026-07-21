@@ -5,6 +5,7 @@ import { InventarioService } from '../../core/services/inventario.service';
 import { ReservasService } from '../../core/services/reservas.service';
 import { ApisNetService } from '../../core/services/apis-net.service';
 import { PaquetesService } from '../../core/services/paquetes.service';
+import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
 import { Inventario } from '../../shared/models/inventario.model';
 import { Paquete } from '../../shared/models/paquete.model';
@@ -24,6 +25,7 @@ export class ReservasComponent implements OnInit, OnDestroy {
   private reservasService = inject(ReservasService);
   private apisNetService = inject(ApisNetService);
   private paquetesService = inject(PaquetesService);
+  private route = inject(ActivatedRoute);
   auth = inject(AuthService);
   countries = PHONE_COUNTRIES;
 
@@ -64,8 +66,7 @@ export class ReservasComponent implements OnInit, OnDestroy {
     idInventario: ['', Validators.required],
     cantidadPersonas: [1, [Validators.required, Validators.min(1)]],
     terminos: [false, Validators.requiredTrue],
-    whatsappOptIn: [true],
-    viajerosAdicionales: this.fb.array([])
+    whatsappOptIn: [true]
   });
 
   ngOnInit(): void {
@@ -81,35 +82,38 @@ export class ReservasComponent implements OnInit, OnDestroy {
       });
     }
     this.inventarioService.getDisponible().subscribe({
-      next: (data) => this.inventarios.set(data)
+      next: (data) => {
+        this.inventarios.set(data);
+        this.preseleccionarInventario();
+      }
     });
     this.paquetesService.getActivos().subscribe({
-      next: (data) => this.paquetes.set(data)
+      next: (data) => {
+        this.paquetes.set(data);
+        this.preseleccionarInventario();
+      }
     });
     this.loadMisReservas();
-    this.form.get('cantidadPersonas')?.valueChanges.subscribe(value => this.syncViajeros(+value || 1));
+  }
+
+  private preseleccionarInventario(): void {
+    const paqueteIdStr = this.route.snapshot.queryParamMap.get('paqueteId');
+    if (paqueteIdStr && this.inventarios().length > 0 && this.paquetes().length > 0) {
+      const pId = +paqueteIdStr;
+      const invMatch = this.inventarios().find(i => i.idPaquete === pId && i.cupoDisponible > 0);
+      if (invMatch && !this.form.get('idInventario')?.value) {
+        this.form.patchValue({ idInventario: invMatch.idInventario });
+      }
+    }
   }
 
   ngOnDestroy(): void {
     this.detenerPolling();
   }
 
-  get viajerosAdicionales(): FormArray {
-    return this.form.get('viajerosAdicionales') as FormArray;
-  }
-
-  private syncViajeros(cantidad: number): void {
-    const adicionales = Math.max(0, cantidad - 1);
-    while (this.viajerosAdicionales.length < adicionales) {
-      this.viajerosAdicionales.push(this.fb.group({
-        nombreCompleto: ['', Validators.required],
-        prefijoTelefono: ['+51', Validators.required],
-        telefono: ['', [Validators.required, Validators.pattern(NATIONAL_PHONE_PATTERN)]]
-      }));
-    }
-    while (this.viajerosAdicionales.length > adicionales) {
-      this.viajerosAdicionales.removeAt(this.viajerosAdicionales.length - 1);
-    }
+  getPaqueteNombre(idPaquete: number): string {
+    const p = this.paquetes().find(x => x.idPaquete === idPaquete);
+    return p?.nombrePaquete || 'Tour';
   }
 
   loadMisReservas(): void {
@@ -169,22 +173,21 @@ export class ReservasComponent implements OnInit, OnDestroy {
     const paquete = inv ? this.paquetes().find(p => p.idPaquete === inv.idPaquete) : undefined;
     const nombreCliente = String(this.form.get('nombreCompleto')!.value).trim();
     const telefonoCliente = toE164(this.form.get('prefijoTelefono')!.value, this.form.get('telefono')!.value);
-    const viajerosAdicionales = this.viajerosAdicionales.getRawValue();
-    const viajeros = [nombreCliente, ...viajerosAdicionales.map((v: any) => String(v.nombreCompleto).trim())];
-    const telefonos = [telefonoCliente, ...viajerosAdicionales.map((v: any) => toE164(v.prefijoTelefono, v.telefono))];
     const user = this.auth.currentUser();
     const buyerPhone = splitE164(user?.telefono);
     const telefonoComprador = user?.telefono?.match(/^\+[1-9]\d{7,14}$/)
       ? user.telefono
       : toE164(buyerPhone.dialCode, buyerPhone.nationalNumber || this.form.get('telefono')!.value);
+    
+    // Almacena al comprador como el único viajero necesario para el registro (se asume que es el responsable)
     const request = {
       idInventario: +this.form.get('idInventario')!.value,
       cantidadPersonas,
       nombreComprador: user ? `${user.nombre} ${user.apellido}`.trim() : nombreCliente,
       telefonoComprador,
       nombreCliente,
-      nombresViajeros: viajeros.join(' | '),
-      telefonosViajeros: telefonos.join(' | '),
+      nombresViajeros: nombreCliente,
+      telefonosViajeros: telefonoCliente,
       dniCliente: this.form.get('dni')!.value,
       emailCliente: this.form.get('email')!.value,
       telefonoCliente,

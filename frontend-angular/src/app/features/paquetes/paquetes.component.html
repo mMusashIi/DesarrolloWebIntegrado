@@ -142,7 +142,7 @@
                 </div>
               </div>
               @if (getInventarioByPaquete(selectedPaquete()!.idPaquete).length > 0) {
-                <a routerLink="/reservas" class="btn btn-lg btn-primary-custom text-white"
+                <a routerLink="/reservas" [queryParams]="{ paqueteId: selectedPaquete()!.idPaquete }" class="btn btn-lg btn-primary-custom text-white"
                   (click)="closeModal()">
                   <i class="fas fa-calendar-plus me-2"></i>Reservar Ahora
                 </a>

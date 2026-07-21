@@ -197,7 +197,7 @@
                       <option value="">Selecciona una fecha disponible</option>
                       @for (inv of inventarios(); track inv.idInventario) {
                         <option [value]="inv.idInventario">
-                          {{ inv.nombrePaquete || 'Tour' }} — {{ inv.fechaSalida }} ({{ inv.cupoDisponible }} cupos)
+                          {{ getPaqueteNombre(inv.idPaquete) }} — {{ inv.fechaSalida }} ({{ inv.cupoDisponible }} cupos)
                         </option>
                       }
                     </select>
@@ -221,30 +221,6 @@
                     }
                   </div>
 
-                  @if (viajerosAdicionales.length > 0) {
-                    <div class="mb-3" formArrayName="viajerosAdicionales">
-                      <label class="form-label fw-bold">Otros viajeros / clientes del servicio *</label>
-                      <p class="text-muted small">Registra nombre y celular internacional de cada persona incluida.</p>
-                      @for (control of viajerosAdicionales.controls; track $index) {
-                        <div class="border rounded p-3 mb-2" [formGroupName]="$index">
-                          <div class="fw-semibold small mb-2">Viajero {{ $index + 2 }}</div>
-                          <input type="text" class="form-control form-control-custom mb-2" formControlName="nombreCompleto"
-                            [placeholder]="'Nombre completo del viajero ' + ($index + 2)">
-                          <div class="input-group">
-                            <select formControlName="prefijoTelefono" class="form-select" style="max-width: 145px;">
-                              @for (country of countries; track country.code) {
-                                <option [value]="country.dialCode">{{ country.code }} {{ country.dialCode }}</option>
-                              }
-                            </select>
-                            <input type="tel" inputmode="numeric" class="form-control" formControlName="telefono" placeholder="Número nacional">
-                          </div>
-                          @if (control.invalid && control.touched) {
-                            <div class="text-danger small mt-1">Completa el nombre y un celular válido.</div>
-                          }
-                        </div>
-                      }
-                    </div>
-                  }
 
                   <div class="form-check mb-4">
                     <input type="checkbox" class="form-check-input" formControlName="whatsappOptIn" id="whatsappOptIn">
