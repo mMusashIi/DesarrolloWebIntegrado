@@ -38,6 +38,7 @@ public class ReservaClient {
                     // Convert to List<ReservaDTO> via Jackson
                     com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
                     mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+                    mapper.disable(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
                     return mapper.convertValue(list,
                             mapper.getTypeFactory().constructCollectionType(List.class, ReservaDTO.class));
                 }
@@ -62,6 +63,7 @@ public class ReservaClient {
                 if (data instanceof List<?> list) {
                     com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
                     mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+                    mapper.disable(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
                     return mapper.convertValue(list,
                             mapper.getTypeFactory().constructCollectionType(List.class, ReservaDTO.class));
                 }
