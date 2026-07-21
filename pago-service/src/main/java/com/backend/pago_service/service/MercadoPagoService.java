@@ -153,7 +153,7 @@ public class MercadoPagoService {
 
         Long reservaId = Long.parseLong(externalRef);
 
-        Pago pago = pagoRepository.findByIdReserva(reservaId)
+        Pago pago = pagoRepository.findByIdReservaForUpdate(reservaId)
                 .stream()
                 .filter(p -> "pendiente".equals(p.getEstado()) && "mercadopago".equals(p.getMetodo()))
                 .findFirst()
